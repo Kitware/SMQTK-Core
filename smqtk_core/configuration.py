@@ -246,7 +246,7 @@ def make_default_config(configurable_iter: Iterable[Type[C]]) -> Dict[str, Union
     ...        ''' Dummy constructor '''
     >>> make_default_config([ExampleConfigurableType]) == {
     ...     'type': None,
-    ...     'smqtk.utils.configuration.ExampleConfigurableType': {
+    ...     'smqtk.smqtk_core.configuration.ExampleConfigurableType': {
     ...         'a': None,
     ...         'b': None,
     ...     }
@@ -291,8 +291,8 @@ def cls_conf_to_config_dict(cls: Type, conf: Dict) -> Dict:
     >>> class SomeClass (object):
     ...     pass
     >>> cls_conf_to_config_dict(SomeClass, {0: 0, 'a': 'b'}) == {
-    ...     'type': 'smqtk.utils.configuration.SomeClass',
-    ...     'smqtk.utils.configuration.SomeClass': {0: 0, 'a': 'b'}
+    ...     'type': 'smqtk.smqtk_core.configuration.SomeClass',
+    ...     'smqtk.smqtk_core.configuration.SomeClass': {0: 0, 'a': 'b'}
     ... }
     True
 

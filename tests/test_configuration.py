@@ -31,7 +31,7 @@ class T2 (Configurable):
     """
     Semi-standard way to implement nested algorithms.
     Usually, algorithms are associated to a plugin getter method that wraps a
-    call to ``smqtk.utils.plugin.get_plugins``, but I'm skipping that for now
+    call to ``smqtk.smqtk_core.plugin.get_plugins``, but I'm skipping that for now
     for simplicity.
     """
 
@@ -170,8 +170,8 @@ def test_make_default_config():
     """
     expected = {
         'type': None,
-        'tests.utils.test_configuration.T1': T1.get_default_config(),
-        'tests.utils.test_configuration.T2': T2.get_default_config(),
+        'tests.smqtk_core.test_configuration.T1': T1.get_default_config(),
+        'tests.smqtk_core.test_configuration.T2': T2.get_default_config(),
     }
     assert make_default_config(T_CLASS_SET) == expected
 
@@ -187,8 +187,8 @@ def test_cls_conf_to_config_dict():
     }
     c1 = cls_conf_to_config_dict(T1, conf1)
     expected1 = {
-        'type': 'tests.utils.test_configuration.T1',
-        'tests.utils.test_configuration.T1': {
+        'type': 'tests.smqtk_core.test_configuration.T1',
+        'tests.smqtk_core.test_configuration.T1': {
             'foo': 1,
             'bar': 'baz',
         },
@@ -202,8 +202,8 @@ def test_cls_conf_to_config_dict():
     }
     c2 = cls_conf_to_config_dict(T1, conf2)
     expected2 = {
-        'type': 'tests.utils.test_configuration.T1',
-        'tests.utils.test_configuration.T1': {
+        'type': 'tests.smqtk_core.test_configuration.T1',
+        'tests.smqtk_core.test_configuration.T1': {
             'foo': 8,
             'bar': 'baz',
         },
@@ -218,7 +218,7 @@ def test_to_config_dict():
     """
     expected_ret_val = 'expected return value'
 
-    with mock.patch('smqtk.utils.configuration.cls_conf_to_config_dict') \
+    with mock.patch('smqtk.smqtk_core.configuration.cls_conf_to_config_dict') \
             as m_cctcd:
         m_cctcd.return_value = expected_ret_val
 
@@ -231,7 +231,7 @@ def test_to_config_dict():
         m_cctcd.assert_called_once_with(T1, i1_expected_conf)
         assert r1 == expected_ret_val
 
-    with mock.patch('smqtk.utils.configuration.cls_conf_to_config_dict') \
+    with mock.patch('smqtk.smqtk_core.configuration.cls_conf_to_config_dict') \
             as m_cctcd:
         m_cctcd.return_value = expected_ret_val
 
@@ -294,12 +294,12 @@ def test_cls_conf_from_config_dict():
     sub-configuration requested.
     """
     test_config = {
-        'type': 'tests.utils.test_configuration.T1',
-        'tests.utils.test_configuration.T1': {
+        'type': 'tests.smqtk_core.test_configuration.T1',
+        'tests.smqtk_core.test_configuration.T1': {
             'foo': 256,
             'bar': 'Some string value'
         },
-        'tests.utils.test_configuration.T2': {
+        'tests.smqtk_core.test_configuration.T2': {
             'child': {'foo': -1, 'bar': 'some other value'},
             'alpha': 1.0,
             'beta': 'euclidean',
@@ -310,7 +310,7 @@ def test_cls_conf_from_config_dict():
     assert cls == T1
     assert cls_conf == {'foo': 256, 'bar': 'Some string value'}
 
-    test_config['type'] = 'tests.utils.test_configuration.T2'
+    test_config['type'] = 'tests.smqtk_core.test_configuration.T2'
     cls, cls_conf = cls_conf_from_config_dict(test_config, T_CLASS_SET)
     assert cls == T2
     assert cls_conf == {
@@ -403,12 +403,12 @@ def test_from_config_dict():
     requested by the configuration.
     """
     test_config = {
-        'type': 'tests.utils.test_configuration.T1',
-        'tests.utils.test_configuration.T1': {
+        'type': 'tests.smqtk_core.test_configuration.T1',
+        'tests.smqtk_core.test_configuration.T1': {
             'foo': 256,
             'bar': 'Some string value'
         },
-        'tests.utils.test_configuration.T2': {
+        'tests.smqtk_core.test_configuration.T2': {
             'child': {'foo': -1, 'bar': 'some other value'},
             'alpha': 1.0,
             'beta': 'euclidean',
@@ -434,17 +434,17 @@ def test_from_config_dict_assertion_error():
     test_class_set = T_CLASS_SET | {NotConfigurable}
 
     test_config = {
-        'type': 'tests.utils.test_configuration.NotConfigurable',
-        'tests.utils.test_configuration.T1': {
+        'type': 'tests.smqtk_core.test_configuration.NotConfigurable',
+        'tests.smqtk_core.test_configuration.T1': {
             'foo': 256,
             'bar': 'Some string value'
         },
-        'tests.utils.test_configuration.T2': {
+        'tests.smqtk_core.test_configuration.T2': {
             'child': {'foo': -1, 'bar': 'some other value'},
             'alpha': 1.0,
             'beta': 'euclidean',
         },
-        'tests.utils.test_configuration.NotConfigurable': {}
+        'tests.smqtk_core.test_configuration.NotConfigurable': {}
     }
     with pytest.raises(AssertionError,
                        match="Configured class type 'NotConfigurable' does not "

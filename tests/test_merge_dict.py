@@ -1,13 +1,14 @@
+from typing import Dict
 import unittest
 
-from smqtk.utils.dict import merge_dict
+from smqtk_core.dict import merge_dict
 
 
 class TestMergeDict (unittest.TestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         # Reset values
-        self.a = {
+        self.a: Dict = {
             1: 2,
             3: 'value',
             'nested': {
@@ -25,7 +26,7 @@ class TestMergeDict (unittest.TestCase):
             's': {'some', 'set', 'here'}
         }
 
-        self.b = {
+        self.b: Dict = {
             3: 'different_value',
             4: 'new value',
             'nested': {
@@ -41,7 +42,7 @@ class TestMergeDict (unittest.TestCase):
             'nested2': 'overwritten value',
         }
 
-        self.expected = {
+        self.expected: Dict = {
             1: 2,
             3: 'different_value',
             4: 'new value',
@@ -61,7 +62,7 @@ class TestMergeDict (unittest.TestCase):
             's': {'some', 'set', 'here'}
         }
 
-    def test_merge_dict_shallow(self):
+    def test_merge_dict_shallow(self) -> None:
         # basic dict merger
         merge_dict(self.a, self.b)
         self.assertEqual(self.a, self.expected)
@@ -78,7 +79,7 @@ class TestMergeDict (unittest.TestCase):
         self.assertIs(self.a['nested']['even_deeper']['j'],
                       self.b['nested']['even_deeper']['j'])
 
-    def test_merge_dict_deepcopy(self):
+    def test_merge_dict_deepcopy(self) -> None:
         # dict merger with deepcopy
         merge_dict(self.a, self.b, deep_copy=True)
         self.assertEqual(self.a, self.expected)
@@ -95,12 +96,12 @@ class TestMergeDict (unittest.TestCase):
         self.assertIsNot(self.a['nested']['even_deeper']['j'],
                          self.b['nested']['even_deeper']['j'])
 
-    def test_merge_dict_return_a(self):
+    def test_merge_dict_return_a(self) -> None:
         # Return value should be the ``a`` parameter input value
         r = merge_dict(self.a, self.b)
         self.assertIs(r, self.a)
 
-    def test_disjoint_update(self):
+    def test_disjoint_update(self) -> None:
         """ Test that ``'c': 3`` gets added to `a`. """
         a = {
             'a': 1,
@@ -117,7 +118,7 @@ class TestMergeDict (unittest.TestCase):
         merge_dict(a, b)
         self.assertEqual(a, expected)
 
-    def test_subset_merge(self):
+    def test_subset_merge(self) -> None:
         """ Test that `b` updates key `a` in dict `a`. """
         a = {
             'a': 1,
@@ -133,7 +134,7 @@ class TestMergeDict (unittest.TestCase):
         merge_dict(a, b)
         self.assertEqual(a, expected)
 
-    def test_partial_update(self):
+    def test_partial_update(self) -> None:
         """
         Test that dict `b` updates and adds keys appropriately to dict `a` (adds
         key `c`, updates key `a`).
@@ -154,7 +155,7 @@ class TestMergeDict (unittest.TestCase):
         merge_dict(a, b)
         self.assertEqual(a, expected)
 
-    def test_overrides(self):
+    def test_overrides(self) -> None:
         """ Test that dict `b` overrides key `b` with a nested dict. """
         a = {
             'a': 1,
@@ -174,7 +175,7 @@ class TestMergeDict (unittest.TestCase):
         merge_dict(a, b)
         self.assertEqual(a, expected)
 
-    def test_nested(self):
+    def test_nested(self) -> None:
         """
         Test that nested dictionary updates occur correctly without losing
         values in sibling or nephew dictionaries.

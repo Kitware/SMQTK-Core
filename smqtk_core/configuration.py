@@ -1,6 +1,6 @@
 """
-Helper interface and functions for generalized object configuration, to and from
-JSON-compliant dictionaries.
+Helper interface and functions for generalized object configuration, to and
+from JSON-compliant dictionaries.
 
 While this interface and utility methods should be general enough to add
 JSON-compliant dictionary-based configuration to any object, this was created
@@ -36,10 +36,11 @@ import inspect
 import json
 import types
 from typing import (
-    Any, Callable, Dict, FrozenSet, Iterable, Sequence, Set, Tuple, Type, TypeVar, Union
+    Any, Callable, Dict, FrozenSet, Iterable, Sequence, Set, Tuple, Type,
+    TypeVar, Union
 )
 
-from smqtk.utils.dict import merge_dict
+from smqtk_core.dict import merge_dict
 
 
 # Type variable for arbitrary types.
@@ -140,7 +141,11 @@ class Configurable (metaclass=abc.ABCMeta):
         return {}
 
     @classmethod
-    def from_config(cls: Type[C], config_dict: Dict, merge_default: bool = True) -> C:
+    def from_config(
+        cls: Type[C],
+        config_dict: Dict,
+        merge_default: bool = True
+    ) -> C:
         """
         Instantiate a new instance of this class given the configuration
         JSON-compliant dictionary encapsulating initialization arguments.
@@ -210,7 +215,7 @@ class Configurable (metaclass=abc.ABCMeta):
         return cls(**config_dict)  # type: ignore
 
     @abc.abstractmethod
-    def get_config(self):
+    def get_config(self) -> Dict[str, Any]:
         """
         Return a JSON-compliant dictionary that could be passed to this class's
         ``from_config`` method to produce an instance with identical
@@ -246,7 +251,7 @@ def make_default_config(configurable_iter: Iterable[Type[C]]) -> Dict[str, Union
     ...        ''' Dummy constructor '''
     >>> make_default_config([ExampleConfigurableType]) == {
     ...     'type': None,
-    ...     'smqtk.smqtk_core.configuration.ExampleConfigurableType': {
+    ...     'smqtk_core.configuration.ExampleConfigurableType': {
     ...         'a': None,
     ...         'b': None,
     ...     }
@@ -291,8 +296,8 @@ def cls_conf_to_config_dict(cls: Type, conf: Dict) -> Dict:
     >>> class SomeClass (object):
     ...     pass
     >>> cls_conf_to_config_dict(SomeClass, {0: 0, 'a': 'b'}) == {
-    ...     'type': 'smqtk.smqtk_core.configuration.SomeClass',
-    ...     'smqtk.smqtk_core.configuration.SomeClass': {0: 0, 'a': 'b'}
+    ...     'type': 'smqtk_core.configuration.SomeClass',
+    ...     'smqtk_core.configuration.SomeClass': {0: 0, 'a': 'b'}
     ... }
     True
 
@@ -320,15 +325,19 @@ def to_config_dict(c_inst: Configurable) -> Dict:
     ``configurable_inst`` into the "standard" SMQTK configuration dictionary
     format (see above module documentation).
 
-    For example, with a simple DataFileElement:
-    >>> from smqtk.representation.data_element.file_element import DataFileElement
-    >>> e = DataFileElement(filepath='/path/to/file.txt', readonly=True)
+    For example, with a simple Configurable derived class:
+    >>> class SimpleConfig(Configurable):
+    ...     def __init__(self, a=1, b='foo'):
+    ...         self.a = a
+    ...         self.b = b
+    ...     def get_config(self):
+    ...         return {'a': self.a, 'b': self.b}
+    >>> e = SimpleConfig(a=2, b="bar")
     >>> to_config_dict(e) == {
-    ...     "type": "smqtk.representation.data_element.file_element.DataFileElement",
-    ...     "smqtk.representation.data_element.file_element.DataFileElement": {
-    ...         "filepath": "/path/to/file.txt",
-    ...         "readonly": True,
-    ...         "explicit_mimetype": None,
+    ...     "type": "smqtk_core.configuration.SimpleConfig",
+    ...     "smqtk_core.configuration.SimpleConfig": {
+    ...         "a": 2,
+    ...         "b": "bar"
     ...     }
     ... }
     True
@@ -414,15 +423,25 @@ def from_config_dict(config: Dict,
     ``from_config`` method on return.
 
     Example:
-    >>> from smqtk.representation import DescriptorElement
+    >>> class SimpleConfig(Configurable):
+    ...     def __init__(self, a=1, b='foo'):
+    ...         self.a = a
+    ...         self.b = b
+    ...     def get_config(self):
+    ...         return {'a': self.a, 'b': self.b}
     >>> example_config = {
-    ...     'type': 'smqtk.representation.descriptor_element.local_elements.DescriptorMemoryElement',
-    ...     'smqtk.representation.descriptor_element.local_elements.DescriptorMemoryElement': {},
+    ...     'type': 'smqtk_core.configuration.SimpleConfig',
+    ...     'smqtk_core.configuration.SimpleConfig': {
+    ...         "a": 3,
+    ...         "b": "baz"
+    ...     },
     ... }
-    >>> inst = from_config_dict(example_config, DescriptorElement.get_impls(),
-    ...                         'type-str', 'some-uuid')
-    >>> from smqtk.representation.descriptor_element.local_elements import DescriptorMemoryElement
-    >>> isinstance(inst, DescriptorMemoryElement)
+    >>> inst = from_config_dict(example_config, {SimpleConfig})
+    >>> isinstance(inst, SimpleConfig)
+    True
+    >>> inst.a == 3
+    True
+    >>> inst.b == "baz"
     True
 
     :raises ValueError:

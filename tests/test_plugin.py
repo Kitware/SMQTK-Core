@@ -9,7 +9,7 @@ from unittest import mock
 import pytest
 
 # noinspection PyProtectedMember
-from smqtk.utils.plugin import (
+from smqtk_core.plugin import (
     OS_ENV_PATH_SEP,
     is_valid_plugin,
     _collect_types_in_module,
@@ -22,8 +22,8 @@ from smqtk.utils.plugin import (
     Pluggable,
 )
 
-from .test_plugin_dir import module_of_stuff
-from .test_plugin_dir import module_of_more_stuff
+from tests.test_plugin_dir import module_of_stuff
+from tests.test_plugin_dir import module_of_more_stuff
 
 
 TYPES_IN_STUFF_MODULE = {
@@ -179,7 +179,7 @@ class TestDiscoveryViaEnvVar:
         assert len(type_set) == 0
 
     @mock.patch.dict(
-        os.environ, {VAR_NAME: "tests.smqtk_core.test_plugin_dir.module_of_stuff"}
+        os.environ, {VAR_NAME: "tests.test_plugin_dir.module_of_stuff"}
     )
     def test_module_in_path(self) -> None:
         """
@@ -192,8 +192,8 @@ class TestDiscoveryViaEnvVar:
 
     @mock.patch.dict(os.environ, {
         VAR_NAME: OS_ENV_PATH_SEP.join([
-            "tests.smqtk_core.test_plugin_dir.module_of_stuff",
-            "tests.smqtk_core.test_plugin_dir.module_of_more_stuff",
+            "tests.test_plugin_dir.module_of_stuff",
+            "tests.test_plugin_dir.module_of_more_stuff",
         ])
     })
     def test_multiple_in_path(self) -> None:
@@ -215,10 +215,10 @@ class TestDiscoveryViaEnvVar:
 
     @mock.patch.dict(os.environ, {
         VAR_NAME: OS_ENV_PATH_SEP.join([
-            "tests.smqtk_core.test_plugin_dir.module_of_stuff",
-            "tests.smqtk_core.test_plugin_dir.module_of_more_stuff",
+            "tests.test_plugin_dir.module_of_stuff",
+            "tests.test_plugin_dir.module_of_more_stuff",
             # The exception causing module.
-            "tests.smqtk_core.test_plugin_dir.module_with_exception"
+            "tests.test_plugin_dir.module_with_exception"
         ])
     })
     def test_module_exception(self) -> None:
@@ -234,7 +234,7 @@ class TestDiscoveryViaEntrypointExtensions:
     Unit tests for entry-point extension based discovery of types.
     """
 
-    @mock.patch("smqtk.smqtk_core.plugin.pkg_resources.iter_entry_points")
+    @mock.patch("smqtk_core.plugin.pkg_resources.iter_entry_points")
     def test_no_extensions_for_entrypoint(self, m_iter_ep: mock.Mock) -> None:
         """
         Test that no types are returned when there are no extensions for the
@@ -245,7 +245,7 @@ class TestDiscoveryViaEntrypointExtensions:
         type_set = discover_via_entrypoint_extensions('my_namespace')
         assert len(type_set) == 0
 
-    @mock.patch("smqtk.smqtk_core.plugin.pkg_resources.iter_entry_points")
+    @mock.patch("smqtk_core.plugin.pkg_resources.iter_entry_points")
     def test_valid_extension_for_ns(self, m_iter_ep: mock.Mock) -> None:
         """
         Test that a module's types are successfully returned when there is an
@@ -253,18 +253,18 @@ class TestDiscoveryViaEntrypointExtensions:
         """
         m_iter_ep.return_value = [
             pkg_resources.EntryPoint.parse(
-                "module_via_extension_one = tests.smqtk_core.test_plugin_dir.module_of_stuff",
+                "module_via_extension_one = tests.test_plugin_dir.module_of_stuff",
                 dist=EMPTY_DIST
             ),
             pkg_resources.EntryPoint.parse(
-                "module_via_extension_two = tests.smqtk_core.test_plugin_dir.module_of_more_stuff",
+                "module_via_extension_two = tests.test_plugin_dir.module_of_more_stuff",
                 dist=EMPTY_DIST
             ),
         ]
         type_set = discover_via_entrypoint_extensions("my_namespace")
         assert type_set == (TYPES_IN_STUFF_MODULE | TYPES_IN_MORE_STUFF_MODULE)
 
-    @mock.patch("smqtk.smqtk_core.plugin.pkg_resources.iter_entry_points")
+    @mock.patch("smqtk_core.plugin.pkg_resources.iter_entry_points")
     def test_invalid_ep_warning(self, m_iter_ep: mock.Mock) -> None:
         """
         Test that a warning is emitted when an entry-point is specified but is
@@ -274,7 +274,7 @@ class TestDiscoveryViaEntrypointExtensions:
             # An attribute specification that should be skipped.
             pkg_resources.EntryPoint.parse(
                 "module_via_extension_bad "
-                "= tests.smqtk_core.test_plugin_dir.module_of_more_stuff:argparse.ArgumentParser",
+                "= tests.test_plugin_dir.module_of_more_stuff:argparse.ArgumentParser",
                 dist=EMPTY_DIST
             ),
         ]
@@ -285,23 +285,23 @@ class TestDiscoveryViaEntrypointExtensions:
         ):
             discover_via_entrypoint_extensions("my_namespace")
 
-    @mock.patch("smqtk.smqtk_core.plugin.pkg_resources.iter_entry_points")
+    @mock.patch("smqtk_core.plugin.pkg_resources.iter_entry_points")
     def test_module_with_error(self, m_iter_ep: mock.Mock) -> None:
         """
         Test when there is an entry-point specifying a module with an error.
         """
         m_iter_ep.return_value = [
             pkg_resources.EntryPoint.parse(
-                "module_via_extension_one = tests.smqtk_core.test_plugin_dir.module_of_stuff",
+                "module_via_extension_one = tests.test_plugin_dir.module_of_stuff",
                 dist=EMPTY_DIST
             ),
             pkg_resources.EntryPoint.parse(
-                "module_via_extension_two = tests.smqtk_core.test_plugin_dir.module_of_more_stuff",
+                "module_via_extension_two = tests.test_plugin_dir.module_of_more_stuff",
                 dist=EMPTY_DIST
             ),
             # Error causing entrypoint
             pkg_resources.EntryPoint.parse(
-                "module_via_extension_two = tests.smqtk_core.test_plugin_dir.module_with_exception",
+                "module_via_extension_two = tests.test_plugin_dir.module_with_exception",
                 dist=EMPTY_DIST
             ),
         ]
@@ -427,9 +427,9 @@ class TestPluggable:
     Unit and behavior tests for the Pluggable mixin abstract interface.
     """
 
-    @mock.patch("smqtk.smqtk_core.plugin.discover_via_subclasses")
-    @mock.patch("smqtk.smqtk_core.plugin.discover_via_entrypoint_extensions")
-    @mock.patch("smqtk.smqtk_core.plugin.discover_via_env_var")
+    @mock.patch("smqtk_core.plugin.discover_via_subclasses")
+    @mock.patch("smqtk_core.plugin.discover_via_entrypoint_extensions")
+    @mock.patch("smqtk_core.plugin.discover_via_env_var")
     def test_no_plugins(
         self,
         m_d_env: mock.Mock,

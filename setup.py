@@ -9,10 +9,6 @@ from typing import cast, Generator, Iterable, List, Optional, Tuple, Union
 import urllib.parse
 
 
-PACKAGE_NAME = "smqtk_core"
-SETUP_DIR = Path(__file__).parent
-
-
 ###############################################################################
 # Some helper functions
 
@@ -117,18 +113,24 @@ def parse_req_strip_version(filepath: Union[str, Path]) -> List[str]:
 
 ################################################################################
 
-if __name__ == "__main__":
-    with open(SETUP_DIR / 'README.md') as f:
-        long_description = f.read()
+PACKAGE_NAME = "smqtk_core"
+SETUP_DIR = Path(__file__).parent
 
+with open(SETUP_DIR / 'README.md') as f:
+    LONG_DESCRIPTION = f.read()
+
+VERSION = parse_version(SETUP_DIR / "smqtk_core" / "__init__.py")
+
+
+if __name__ == "__main__":
     setuptools.setup(
         name=PACKAGE_NAME,
-        version=parse_version(SETUP_DIR / "smqtk_core" / "__init__.py"),
+        version=VERSION,
         description=(
             'Python toolkit for pluggable algorithms and data structures '
             'for multimedia-based machine learning'
         ),
-        long_description=long_description,
+        long_description=LONG_DESCRIPTION,
         author='Kitware, Inc.',
         author_email='smqtk-developers@kitware.com',
         url='https://gitlab.kitware.com/smqtk/smqtk-core',

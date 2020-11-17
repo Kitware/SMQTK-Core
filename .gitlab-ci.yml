@@ -6,7 +6,9 @@ stages:
 default:
   image: python:3.6-buster
   tags:
+    - linux
     - docker
+    - test
 
 # Global default variables set for all jobs unless overridden by job-specific
 # configuration.

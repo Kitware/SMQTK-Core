@@ -164,30 +164,47 @@ class Configurable (metaclass=abc.ABCMeta):
 
         .. code-block:: python
 
+           D = TypeVar("D", bound="MyClass")
+
            class MyClass (Configurable):
 
                @classmethod
-               def from_config(cls, config_dict, merge_default=True):
+               def from_config(
+                   cls: Type(D),
+                   config_dict: Dict,
+                   merge_default: bool = True
+               ) -> D:
+                   # Perform a shallow copy of the input ``config_dict`` which
+                   # is important to maintain idempotency.
+                   config_dict = dict(config_dict)
+
                    # Optionally guarantee default values are present in the
-                   # configuration dictionary.  This statement pairs with the
-                   # ``merge_default=False`` parameter in the super call.
-                   # This also in effect shallow copies the given non-dictionary
-                   # entries of ``config_dict`` due to the merger with the
-                   # default config.
+                   # configuration dictionary.  This is useful when the
+                   # configuration dictionary input is partial and the logic
+                   # contained here wants to use config parameters that may
+                   # have defaults defined in the constructor.
                    if merge_default:
                        config_dict = merge_dict(cls.get_default_config(),
                                                 config_dict)
 
                    #
-                   # Perform any overriding here.
+                   # Perform any overriding of `config_dict` values here.
                    #
 
                    # Create and return an instance using the super method.
-                   return super(MyClass, cls).from_config(config_dict,
-                                                          merge_default=False)
+                   return super().from_config(config_dict,
+                                              merge_default=merge_default)
 
-        This method should not be called via super unless an instance of the
-        class is desired.
+        *Note on type annotations*:
+        When defining a sub-class of configurable and override this class
+        method, we will need to defined a new TypeVar that is bound at the new
+        class type.  This is because super requires a type to be given that
+        descends from the implementing type.  If `C` is used as defined in this
+        interface module, which is upper-bounded on the base
+        :py:class:`Configurable` class, the type analysis will see that we are
+        attempting to invoke super with a type that may not strictly descend
+        from the implementing type (``MyClass`` in the example above), and
+        cause an error during type analysis.
 
         :param config_dict: JSON compliant dictionary encapsulating
             a configuration.

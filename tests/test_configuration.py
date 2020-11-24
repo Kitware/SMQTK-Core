@@ -1,10 +1,9 @@
-from typing import Any, Dict, Set, Type
+from typing import Any, Dict, Set, Type, TypeVar
 import unittest.mock as mock
 
 import pytest
 
 from smqtk_core.configuration import (
-    C,  # TypeVar for a Configurable-inheriting type.
     cls_conf_from_config_dict,
     cls_conf_to_config_dict,
     Configurable,
@@ -30,6 +29,9 @@ class T1 (Configurable):
         }
 
 
+D = TypeVar("D", bound="T2")
+
+
 class T2 (Configurable):
     """
     Semi-standard way to implement nested algorithms.
@@ -48,12 +50,12 @@ class T2 (Configurable):
 
     @classmethod
     def from_config(
-        cls: Type[C],
+        cls: Type[D],
         config: Dict,
         merge_default: bool = True
-    ) -> C:
+    ) -> D:
         config['child'] = T1.from_config(config['child'])
-        return super(T2, cls).from_config(config, merge_default)
+        return super().from_config(config, merge_default)
 
     def __init__(self, child: T1 = T1(), alpha: float = 0.0001,
                  beta: str = 'default') -> None:

@@ -1,6 +1,6 @@
 """
-Helper interface and functions for generalized object configuration, to and from
-JSON-compliant dictionaries.
+Helper interface and functions for generalized object configuration, to and
+from JSON-compliant dictionaries.
 
 While this interface and utility methods should be general enough to add
 JSON-compliant dictionary-based configuration to any object, this was created
@@ -36,10 +36,11 @@ import inspect
 import json
 import types
 from typing import (
-    Any, Callable, Dict, FrozenSet, Iterable, Sequence, Set, Tuple, Type, TypeVar, Union
+    Any, Callable, Dict, FrozenSet, Iterable, Sequence, Set, Tuple, Type,
+    TypeVar, Union
 )
 
-from smqtk.utils.dict import merge_dict
+from smqtk_core.dict import merge_dict
 
 
 # Type variable for arbitrary types.
@@ -140,7 +141,11 @@ class Configurable (metaclass=abc.ABCMeta):
         return {}
 
     @classmethod
-    def from_config(cls: Type[C], config_dict: Dict, merge_default: bool = True) -> C:
+    def from_config(
+        cls: Type[C],
+        config_dict: Dict,
+        merge_default: bool = True
+    ) -> C:
         """
         Instantiate a new instance of this class given the configuration
         JSON-compliant dictionary encapsulating initialization arguments.
@@ -159,30 +164,47 @@ class Configurable (metaclass=abc.ABCMeta):
 
         .. code-block:: python
 
+           D = TypeVar("D", bound="MyClass")
+
            class MyClass (Configurable):
 
                @classmethod
-               def from_config(cls, config_dict, merge_default=True):
+               def from_config(
+                   cls: Type(D),
+                   config_dict: Dict,
+                   merge_default: bool = True
+               ) -> D:
+                   # Perform a shallow copy of the input ``config_dict`` which
+                   # is important to maintain idempotency.
+                   config_dict = dict(config_dict)
+
                    # Optionally guarantee default values are present in the
-                   # configuration dictionary.  This statement pairs with the
-                   # ``merge_default=False`` parameter in the super call.
-                   # This also in effect shallow copies the given non-dictionary
-                   # entries of ``config_dict`` due to the merger with the
-                   # default config.
+                   # configuration dictionary.  This is useful when the
+                   # configuration dictionary input is partial and the logic
+                   # contained here wants to use config parameters that may
+                   # have defaults defined in the constructor.
                    if merge_default:
                        config_dict = merge_dict(cls.get_default_config(),
                                                 config_dict)
 
                    #
-                   # Perform any overriding here.
+                   # Perform any overriding of `config_dict` values here.
                    #
 
                    # Create and return an instance using the super method.
-                   return super(MyClass, cls).from_config(config_dict,
-                                                          merge_default=False)
+                   return super().from_config(config_dict,
+                                              merge_default=merge_default)
 
-        This method should not be called via super unless an instance of the
-        class is desired.
+        *Note on type annotations*:
+        When defining a sub-class of configurable and override this class
+        method, we will need to defined a new TypeVar that is bound at the new
+        class type.  This is because super requires a type to be given that
+        descends from the implementing type.  If `C` is used as defined in this
+        interface module, which is upper-bounded on the base
+        :py:class:`Configurable` class, the type analysis will see that we are
+        attempting to invoke super with a type that may not strictly descend
+        from the implementing type (``MyClass`` in the example above), and
+        cause an error during type analysis.
 
         :param config_dict: JSON compliant dictionary encapsulating
             a configuration.
@@ -210,7 +232,7 @@ class Configurable (metaclass=abc.ABCMeta):
         return cls(**config_dict)  # type: ignore
 
     @abc.abstractmethod
-    def get_config(self):
+    def get_config(self) -> Dict[str, Any]:
         """
         Return a JSON-compliant dictionary that could be passed to this class's
         ``from_config`` method to produce an instance with identical
@@ -246,7 +268,7 @@ def make_default_config(configurable_iter: Iterable[Type[C]]) -> Dict[str, Union
     ...        ''' Dummy constructor '''
     >>> make_default_config([ExampleConfigurableType]) == {
     ...     'type': None,
-    ...     'smqtk.utils.configuration.ExampleConfigurableType': {
+    ...     'smqtk_core.configuration.ExampleConfigurableType': {
     ...         'a': None,
     ...         'b': None,
     ...     }
@@ -291,8 +313,8 @@ def cls_conf_to_config_dict(cls: Type, conf: Dict) -> Dict:
     >>> class SomeClass (object):
     ...     pass
     >>> cls_conf_to_config_dict(SomeClass, {0: 0, 'a': 'b'}) == {
-    ...     'type': 'smqtk.utils.configuration.SomeClass',
-    ...     'smqtk.utils.configuration.SomeClass': {0: 0, 'a': 'b'}
+    ...     'type': 'smqtk_core.configuration.SomeClass',
+    ...     'smqtk_core.configuration.SomeClass': {0: 0, 'a': 'b'}
     ... }
     True
 
@@ -320,15 +342,19 @@ def to_config_dict(c_inst: Configurable) -> Dict:
     ``configurable_inst`` into the "standard" SMQTK configuration dictionary
     format (see above module documentation).
 
-    For example, with a simple DataFileElement:
-    >>> from smqtk.representation.data_element.file_element import DataFileElement
-    >>> e = DataFileElement(filepath='/path/to/file.txt', readonly=True)
+    For example, with a simple Configurable derived class:
+    >>> class SimpleConfig(Configurable):
+    ...     def __init__(self, a=1, b='foo'):
+    ...         self.a = a
+    ...         self.b = b
+    ...     def get_config(self):
+    ...         return {'a': self.a, 'b': self.b}
+    >>> e = SimpleConfig(a=2, b="bar")
     >>> to_config_dict(e) == {
-    ...     "type": "smqtk.representation.data_element.file_element.DataFileElement",
-    ...     "smqtk.representation.data_element.file_element.DataFileElement": {
-    ...         "filepath": "/path/to/file.txt",
-    ...         "readonly": True,
-    ...         "explicit_mimetype": None,
+    ...     "type": "smqtk_core.configuration.SimpleConfig",
+    ...     "smqtk_core.configuration.SimpleConfig": {
+    ...         "a": 2,
+    ...         "b": "bar"
     ...     }
     ... }
     True
@@ -414,15 +440,25 @@ def from_config_dict(config: Dict,
     ``from_config`` method on return.
 
     Example:
-    >>> from smqtk.representation import DescriptorElement
+    >>> class SimpleConfig(Configurable):
+    ...     def __init__(self, a=1, b='foo'):
+    ...         self.a = a
+    ...         self.b = b
+    ...     def get_config(self):
+    ...         return {'a': self.a, 'b': self.b}
     >>> example_config = {
-    ...     'type': 'smqtk.representation.descriptor_element.local_elements.DescriptorMemoryElement',
-    ...     'smqtk.representation.descriptor_element.local_elements.DescriptorMemoryElement': {},
+    ...     'type': 'smqtk_core.configuration.SimpleConfig',
+    ...     'smqtk_core.configuration.SimpleConfig': {
+    ...         "a": 3,
+    ...         "b": "baz"
+    ...     },
     ... }
-    >>> inst = from_config_dict(example_config, DescriptorElement.get_impls(),
-    ...                         'type-str', 'some-uuid')
-    >>> from smqtk.representation.descriptor_element.local_elements import DescriptorMemoryElement
-    >>> isinstance(inst, DescriptorMemoryElement)
+    >>> inst = from_config_dict(example_config, {SimpleConfig})
+    >>> isinstance(inst, SimpleConfig)
+    True
+    >>> inst.a == 3
+    True
+    >>> inst.b == "baz"
     True
 
     :raises ValueError:

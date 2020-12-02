@@ -1,3 +1,6 @@
+# This is an implicit value, here for clarity
+--index-url https://pypi.python.org/simple/
+
 # Sphinx (pinned here for CI/stability, unpinned for read-the-docs)
 Sphinx==3.2.1
 sphinx-rtd-theme==0.5.0

@@ -1,82 +1,139 @@
-# Python auto-compiled files
-*.pyc
-*.pyo
+### Python template
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
 
-# Mac OSX files
-.DS_Store
+# C extensions
+*.so
 
-# Sphinx compile files
-/docs/_build/
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
 
-# Ignore generated files from examples
-/docs/examples/nnss_incremental_update/leedsbutterfly_dataset_v1.0.zip
-/docs/examples/nnss_incremental_update/leedsbutterfly
-/docs/examples/nnss_incremental_update/2a.completed_files.csv
-/docs/examples/nnss_incremental_update/2b.itq.256bit.mean_vec.npy
-/docs/examples/nnss_incremental_update/2b.itq.256bit.rotation.npy
-/docs/examples/nnss_incremental_update/2c.hash2uuids.pickle
-/docs/examples/nnss_incremental_update/2d.hash2uuids.pickle
-/docs/examples/nnss_incremental_update/3.completed_files.csv
-/docs/examples/nnss_incremental_update/3.uuids_for_processing.txt
-/docs/examples/nnss_incremental_update/4.completed_files.csv
-/docs/examples/nnss_incremental_update/4.uuids_for_processing.txt
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
 
-# ColorDescriptor generated errors log file
-errors.log
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
 
-# Coverage report
-.coverage*
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
 
-# Setuptools/Distutils produced files/dirs
-/build
-/dist
-/python/smqtk.egg-info
-/.eggs
+# Translations
+*.mo
+*.pot
 
-# Py.test cache directory
-/.cache
-/.pytest_cache
-__pycache__
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
 
-# Tox cache directory
-/.tox
+# Flask stuff:
+instance/
+.webassets-cache
 
-# MyPy cache director
-/.mypy_cache
+# Scrapy stuff:
+.scrapy
 
-#
-# TPL
-#
+# Sphinx documentation
+docs/_build/
 
-### TPL/flann-1.8.4 ###
-/TPL/flann-1.8.4/CMakeCache.txt
-/TPL/flann-1.8.4/CPack*
-/TPL/flann-1.8.4/install_manifest.txt
-/TPL/flann-1.8.4/uninstall_target.cmake
-/TPL/flann-1.8.4/**/CMakeFiles/
-/TPL/flann-1.8.4/**/Makefile
-/TPL/flann-1.8.4/**/cmake_install.cmake
-/TPL/flann-1.8.4/bin/flann_example_c
-/TPL/flann-1.8.4/bin/flann_example_cpp
-/TPL/flann-1.8.4/cmake/flann.pc
-/TPL/flann-1.8.4/doc/build/
-/TPL/flann-1.8.4/lib/
-/TPL/flann-1.8.4/src/python/build
-/TPL/flann-1.8.4/src/python/setup.py
+# PyBuilder
+.pybuilder/
+target/
 
-### TPL/libsvm-3.1-custom
-/TPL/libsvm-3.1-custom/eval.o
-/TPL/libsvm-3.1-custom/svm.o
-/TPL/libsvm-3.1-custom/libsvm.so.2
-/TPL/libsvm-3.1-custom/binary-predict
-/TPL/libsvm-3.1-custom/binary-train
-/TPL/libsvm-3.1-custom/svm-predict
-/TPL/libsvm-3.1-custom/svm-prob
-/TPL/libsvm-3.1-custom/svm-scale
-/TPL/libsvm-3.1-custom/svm-train
-/TPL/libsvm-3.1-custom/python/build
-/TPL/libsvm-3.1-custom/python/libsvm.egg-info
+# Jupyter Notebook
+.ipynb_checkpoints
 
-/bin/memex/hackathon_2016_07/scripts/es_config.json
-/bin/memex/hackathon_2016_07/notebooks/.ipynb_checkpoints/
-/bin/memex/hackathon_2016_07/data/
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+#   For a library or package, you might want to ignore these files since the code is
+#   intended to run in multiple environments; otherwise, check them in:
+# .python-version
+
+# pipenv
+#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
+#   However, in case of collaboration, if having platform-specific dependencies or dependencies
+#   having no cross-platform support, pipenv may install dependencies that don't work, or not
+#   install all needed dependencies.
+#Pipfile.lock
+
+# PEP 582; used by e.g. github.com/David-OConnor/pyflow
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/

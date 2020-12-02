@@ -1,7 +1,9 @@
+from typing import Any, Dict, Set, Type, TypeVar
 import unittest.mock as mock
+
 import pytest
 
-from smqtk.utils.configuration import (
+from smqtk_core.configuration import (
     cls_conf_from_config_dict,
     cls_conf_to_config_dict,
     Configurable,
@@ -16,27 +18,30 @@ from smqtk.utils.configuration import (
 
 class T1 (Configurable):
 
-    def __init__(self, foo=1, bar='baz'):
+    def __init__(self, foo: int = 1, bar: str = 'baz') -> None:
         self.foo = foo
         self.bar = bar
 
-    def get_config(self):
+    def get_config(self) -> Dict:
         return {
             'foo': self.foo,
             'bar': self.bar,
         }
 
 
+D = TypeVar("D", bound="T2")
+
+
 class T2 (Configurable):
     """
     Semi-standard way to implement nested algorithms.
     Usually, algorithms are associated to a plugin getter method that wraps a
-    call to ``smqtk.utils.plugin.get_plugins``, but I'm skipping that for now
+    call to ``smqtk_core.plugin.get_plugins``, but I'm skipping that for now
     for simplicity.
     """
 
     @classmethod
-    def get_default_config(cls):
+    def get_default_config(cls) -> Dict[str, Any]:
         default = super(T2, cls).get_default_config()
         # Replace ``child``, which we know has a default value of type ``T1``
         # with its default config.
@@ -44,17 +49,22 @@ class T2 (Configurable):
         return default
 
     @classmethod
-    def from_config(cls, config, merge_default=True):
+    def from_config(
+        cls: Type[D],
+        config: Dict,
+        merge_default: bool = True
+    ) -> D:
         config['child'] = T1.from_config(config['child'])
-        return super(T2, cls).from_config(config)
+        return super().from_config(config, merge_default)
 
-    def __init__(self, child=T1(), alpha=0.0001, beta='default'):
-        # Where child is supposed to be an instance of DummyAlgo1
+    def __init__(self, child: T1 = T1(), alpha: float = 0.0001,
+                 beta: str = 'default') -> None:
+        # Where child is supposed to be an instance of T1
         self.child = child
         self.alpha = alpha
         self.beta = beta
 
-    def get_config(self):
+    def get_config(self) -> Dict[str, Any]:
         return {
             'child': self.child.get_config(),
             'alpha': self.alpha,
@@ -63,13 +73,13 @@ class T2 (Configurable):
 
 
 # Set of "available" types for tests below.
-T_CLASS_SET = {T1, T2}
+T_CLASS_SET: Set[Type[Configurable]] = {T1, T2}
 
 
 ###############################################################################
 # Tests
 
-def test_configurable_default_config():
+def test_configurable_default_config() -> None:
     """
     Test that constructor arguments are introspected automatically with None
     defaults.
@@ -78,12 +88,12 @@ def test_configurable_default_config():
     # noinspection PyAbstractClass
     class T (Configurable):
         # noinspection PyUnusedLocal
-        def __init__(self, a, b, cat):
+        def __init__(self, a: Any, b: Any, cat: Any):
             pass
     assert T.get_default_config() == {'a': None, 'b': None, 'cat': None}
 
 
-def test_configurable_default_config_kwonlys():
+def test_configurable_default_config_kwonlys() -> None:
     """
     Test properly getting constructor defaults when there are keyword-only
     arguments present (presence of the `*` in the parameter list).
@@ -92,12 +102,12 @@ def test_configurable_default_config_kwonlys():
     # noinspection PyAbstractClass
     class T (Configurable):
         # noinspection PyUnusedLocal
-        def __init__(self, a, *, b=0):
+        def __init__(self, a: Any, *, b: int = 0):
             pass
     assert T.get_default_config() == dict(a=None, b=0)
 
 
-def test_configurable_default_config_no_init():
+def test_configurable_default_config_no_init() -> None:
     """
     Test that an empty dictionary is returned when a class has no ``__init__``
     defined.
@@ -110,7 +120,7 @@ def test_configurable_default_config_no_init():
     assert NoInitExample.get_default_config() == {}
 
 
-def test_configurable_default_config_with_star_args():
+def test_configurable_default_config_with_star_args() -> None:
     """
     Test that star-stuff shouldn't change anything
     """
@@ -118,12 +128,12 @@ def test_configurable_default_config_with_star_args():
     # noinspection PyAbstractClass
     class T (Configurable):
         # noinspection PyUnusedLocal
-        def __init__(self, a, b, cat, *args, **kwargs):
+        def __init__(self, a: Any, b: Any, cat: Any, *args: Any, **kwargs: Any):
             pass
     assert T.get_default_config() == {'a': None, 'b': None, 'cat': None}
 
 
-def test_configurable_default_config_with_default_values():
+def test_configurable_default_config_with_default_values() -> None:
     """
     Test that default values are correctly introspected.
     """
@@ -131,13 +141,13 @@ def test_configurable_default_config_with_default_values():
     # noinspection PyAbstractClass
     class T (Configurable):
         # noinspection PyUnusedLocal
-        def __init__(self, a, b, c=0, d='foobar'):
+        def __init__(self, a: Any, b: Any, c: int = 0, d: str = 'foobar'):
             pass
     assert T.get_default_config() == \
         {'a': None, 'b': None, 'c': 0, 'd': 'foobar'}
 
 
-def test_configurable_default_config_with_default_values_with_star_args():
+def test_configurable_default_config_with_default_values_with_star_args() -> None:
     """
     Test that star stuff shouldn't change anything when there are default
     values.
@@ -146,13 +156,14 @@ def test_configurable_default_config_with_default_values_with_star_args():
     # noinspection PyAbstractClass
     class T (Configurable):
         # noinspection PyUnusedLocal
-        def __init__(self, a, b, c=0, d='foobar', *args, **kwargs):
+        def __init__(self, a: Any, b: Any, c: int = 0, d: str = 'foobar',
+                     *args: Any, **kwargs: Any):
             pass
     assert T.get_default_config() == \
         {'a': None, 'b': None, 'c': 0, 'd': 'foobar'}
 
 
-def test_configurable_classmethod_override_getdefaultconfig():
+def test_configurable_classmethod_override_getdefaultconfig() -> None:
     """
     Test overriding the class method get_default_config
     """
@@ -164,19 +175,19 @@ def test_configurable_classmethod_override_getdefaultconfig():
     }
 
 
-def test_make_default_config():
+def test_make_default_config() -> None:
     """
     Test expected normal operation of ``make_default_config``.
     """
     expected = {
         'type': None,
-        'tests.utils.test_configuration.T1': T1.get_default_config(),
-        'tests.utils.test_configuration.T2': T2.get_default_config(),
+        'tests.test_configuration.T1': T1.get_default_config(),
+        'tests.test_configuration.T2': T2.get_default_config(),
     }
     assert make_default_config(T_CLASS_SET) == expected
 
 
-def test_cls_conf_to_config_dict():
+def test_cls_conf_to_config_dict() -> None:
     """
     Test that ``to_config_dict`` correctly reflects the contents of the config
     return from the instance passed to it.
@@ -187,8 +198,8 @@ def test_cls_conf_to_config_dict():
     }
     c1 = cls_conf_to_config_dict(T1, conf1)
     expected1 = {
-        'type': 'tests.utils.test_configuration.T1',
-        'tests.utils.test_configuration.T1': {
+        'type': 'tests.test_configuration.T1',
+        'tests.test_configuration.T1': {
             'foo': 1,
             'bar': 'baz',
         },
@@ -202,8 +213,8 @@ def test_cls_conf_to_config_dict():
     }
     c2 = cls_conf_to_config_dict(T1, conf2)
     expected2 = {
-        'type': 'tests.utils.test_configuration.T1',
-        'tests.utils.test_configuration.T1': {
+        'type': 'tests.test_configuration.T1',
+        'tests.test_configuration.T1': {
             'foo': 8,
             'bar': 'baz',
         },
@@ -211,14 +222,14 @@ def test_cls_conf_to_config_dict():
     assert c2 == expected2
 
 
-def test_to_config_dict():
+def test_to_config_dict() -> None:
     """
     Test that the second-level helper function is called appropriately and
     directly returns.
     """
     expected_ret_val = 'expected return value'
 
-    with mock.patch('smqtk.utils.configuration.cls_conf_to_config_dict') \
+    with mock.patch('smqtk_core.configuration.cls_conf_to_config_dict') \
             as m_cctcd:
         m_cctcd.return_value = expected_ret_val
 
@@ -231,7 +242,7 @@ def test_to_config_dict():
         m_cctcd.assert_called_once_with(T1, i1_expected_conf)
         assert r1 == expected_ret_val
 
-    with mock.patch('smqtk.utils.configuration.cls_conf_to_config_dict') \
+    with mock.patch('smqtk_core.configuration.cls_conf_to_config_dict') \
             as m_cctcd:
         m_cctcd.return_value = expected_ret_val
 
@@ -245,7 +256,7 @@ def test_to_config_dict():
         assert r2 == expected_ret_val
 
 
-def test_to_config_dict_given_type():
+def test_to_config_dict_given_type() -> None:
     """
     Test that ``to_config_dict`` errors when passed a type.
     """
@@ -254,25 +265,26 @@ def test_to_config_dict_given_type():
                        match="c_inst must be an instance and its type must "
                              r"subclass from Configurable\."):
         # noinspection PyTypeChecker
-        to_config_dict(object)
+        to_config_dict(object)  # type: ignore
 
     # Literally the Configurable interface (abstract class)
     with pytest.raises(ValueError,
                        match="c_inst must be an instance and its type must "
                              r"subclass from Configurable\."):
         # noinspection PyTypeChecker
-        to_config_dict(Configurable)
+        to_config_dict(Configurable)  # type: ignore
 
-    # New sub-class implementing Configurable
+    # New sub-class implementing Configurable, but passed as the type not an
+    # instance.
     class SomeConfigurableType (Configurable):
-        def get_config(self):
+        def get_config(self) -> Dict[str, Any]:
             return {}
     with pytest.raises(ValueError):
         # noinspection PyTypeChecker
-        to_config_dict(SomeConfigurableType)
+        to_config_dict(SomeConfigurableType)  # type: ignore
 
 
-def test_to_config_dict_given_non_configurable():
+def test_to_config_dict_given_non_configurable() -> None:
     """
     Test that ``to_config_dict`` errors when passed an instance that does not
     descend from configurable.
@@ -285,21 +297,21 @@ def test_to_config_dict_given_non_configurable():
                        match="c_inst must be an instance and its type must "
                              r"subclass from Configurable\."):
         # noinspection PyTypeChecker
-        to_config_dict(inst)
+        to_config_dict(inst)  # type: ignore
 
 
-def test_cls_conf_from_config_dict():
+def test_cls_conf_from_config_dict() -> None:
     """
     Test that ``cls_conf_from_config_dict`` returns the correct type and
     sub-configuration requested.
     """
     test_config = {
-        'type': 'tests.utils.test_configuration.T1',
-        'tests.utils.test_configuration.T1': {
+        'type': 'tests.test_configuration.T1',
+        'tests.test_configuration.T1': {
             'foo': 256,
             'bar': 'Some string value'
         },
-        'tests.utils.test_configuration.T2': {
+        'tests.test_configuration.T2': {
             'child': {'foo': -1, 'bar': 'some other value'},
             'alpha': 1.0,
             'beta': 'euclidean',
@@ -310,7 +322,7 @@ def test_cls_conf_from_config_dict():
     assert cls == T1
     assert cls_conf == {'foo': 256, 'bar': 'Some string value'}
 
-    test_config['type'] = 'tests.utils.test_configuration.T2'
+    test_config['type'] = 'tests.test_configuration.T2'
     cls, cls_conf = cls_conf_from_config_dict(test_config, T_CLASS_SET)
     assert cls == T2
     assert cls_conf == {
@@ -320,7 +332,7 @@ def test_cls_conf_from_config_dict():
     }
 
 
-def test_cls_conf_from_config_missing_type():
+def test_cls_conf_from_config_missing_type() -> None:
     """
     Test that ``from_config_dict`` throws an exception when no 'type' key is
     present.
@@ -340,11 +352,11 @@ def test_cls_conf_from_config_missing_type():
         cls_conf_from_config_dict(test_config, T_CLASS_SET)
 
 
-def test_cls_conf_from_config_none_type():
+def test_cls_conf_from_config_none_type() -> None:
     """
     Test that appropriate exception is raised when `type` key is None valued.
     """
-    test_config = {
+    test_config: Dict[str, Any] = {
         'type': None,
         'T1': {'foo': 256, 'bar': 'Some string value'},
         'T2': {
@@ -359,7 +371,7 @@ def test_cls_conf_from_config_none_type():
         cls_conf_from_config_dict(test_config, T_CLASS_SET)
 
 
-def test_cls_conf_from_config_config_label_mismatch():
+def test_cls_conf_from_config_config_label_mismatch() -> None:
     test_config = {
         'type': 'not-present-label',
         'T1': {'foo': 256, 'bar': 'Some string value'},
@@ -378,7 +390,7 @@ def test_cls_conf_from_config_config_label_mismatch():
         cls_conf_from_config_dict(test_config, T_CLASS_SET)
 
 
-def test_cls_conf_from_config_impl_label_mismatch():
+def test_cls_conf_from_config_impl_label_mismatch() -> None:
     test_config = {
         'type': 'NotAnImpl',
         'T1': {'foo': 256, 'bar': 'Some string value'},
@@ -397,18 +409,18 @@ def test_cls_conf_from_config_impl_label_mismatch():
         cls_conf_from_config_dict(test_config, T_CLASS_SET)
 
 
-def test_from_config_dict():
+def test_from_config_dict() -> None:
     """
     Test that ``from_config_dict`` correctly creates an instance of the class
     requested by the configuration.
     """
     test_config = {
-        'type': 'tests.utils.test_configuration.T1',
-        'tests.utils.test_configuration.T1': {
+        'type': 'tests.test_configuration.T1',
+        'tests.test_configuration.T1': {
             'foo': 256,
             'bar': 'Some string value'
         },
-        'tests.utils.test_configuration.T2': {
+        'tests.test_configuration.T2': {
             'child': {'foo': -1, 'bar': 'some other value'},
             'alpha': 1.0,
             'beta': 'euclidean',
@@ -423,7 +435,7 @@ def test_from_config_dict():
     assert i.bar == "Some string value"
 
 
-def test_from_config_dict_assertion_error():
+def test_from_config_dict_assertion_error() -> None:
     """
     Test that assertion error is raised when a class is provided AND specified
     that does not descend from the Configurable interface.
@@ -433,20 +445,20 @@ def test_from_config_dict_assertion_error():
 
     test_class_set = T_CLASS_SET | {NotConfigurable}
 
-    test_config = {
-        'type': 'tests.utils.test_configuration.NotConfigurable',
-        'tests.utils.test_configuration.T1': {
+    test_config: Dict[str, Any] = {
+        'type': 'tests.test_configuration.NotConfigurable',
+        'tests.test_configuration.T1': {
             'foo': 256,
             'bar': 'Some string value'
         },
-        'tests.utils.test_configuration.T2': {
+        'tests.test_configuration.T2': {
             'child': {'foo': -1, 'bar': 'some other value'},
             'alpha': 1.0,
             'beta': 'euclidean',
         },
-        'tests.utils.test_configuration.NotConfigurable': {}
+        'tests.test_configuration.NotConfigurable': {}
     }
     with pytest.raises(AssertionError,
                        match="Configured class type 'NotConfigurable' does not "
                              r"descend from `Configurable`\."):
-        from_config_dict(test_config, test_class_set)
+        from_config_dict(test_config, test_class_set)  # type: ignore

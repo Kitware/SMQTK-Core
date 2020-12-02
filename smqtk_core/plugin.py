@@ -361,12 +361,13 @@ class Pluggable(metaclass=abc.ABCMeta):
         """
         Discover and return a set of classes that implement the calling class.
 
-        See the ``get_plugins`` function for more details on the logic of how
-        implementing classes (aka "plugins") are discovered.
+        See the various :func:`discover_via_*` functions in this module for
+        more details on the logic of how implementing classes (aka "plugins")
+        are discovered.
 
-        The class-level variables ``PLUGIN_ENV_VAR`` and ``PLUGIN_HELPER_VAR``
-        may be overridden to change what environment and helper variable are
-        looked for, respectively.
+        The class-level variables ``PLUGIN_ENV_VAR`` and ``PLUGIN_NAMESPACE``
+        may be overridden to change what environment and entry-point extension
+        are looked for, respectively.
 
         :return: Set of discovered class types that are considered "valid"
             plugins of this type. See :py:func:`is_valid_plugin` for what we

@@ -1,13 +1,14 @@
 stages:
-  - build
   - test
 
 # Global default parameters set for all jobs unless overridden by job-specific
 # configuration.
 default:
-  image: python:3.8-buster
+  image: python:3.6-buster
   tags:
-    - smqtk
+    - linux
+    - docker
+    - test
 
 # Global default variables set for all jobs unless overridden by job-specific
 # configuration.
@@ -28,42 +29,35 @@ variables:
 ###############################################################################
 # Jobs
 
-#build:
-#  stage: build
-#  script:
-#    - echo "Placeholder for any build operations required."
-
 test:py36:
   stage: test
-  image: python:3.6-buster
+  # See "default:" above for implicitly included parameters.
   script:
     - *test_setup  # expand `&test_setup` anchor above into here.
-    - pytest --cov=smqtk --cov-config=.pytest.coveragerc
+    - pytest --cov=smqtk_core --cov-config=.pytest.coveragerc
 
 test:py37:
   stage: test
   image: python:3.7-buster
   script:
     - *test_setup  # expand `&test_setup` anchor above into here.
-    - pytest --cov=smqtk --cov-config=.pytest.coveragerc
+    - pytest --cov=smqtk_core --cov-config=.pytest.coveragerc
 
 test:py38:
   stage: test
   image: python:3.8-buster
   script:
     - *test_setup  # expand `&test_setup` anchor above into here.
-    - pytest --cov=smqtk --cov-config=.pytest.coveragerc
+    - pytest --cov=smqtk_core --cov-config=.pytest.coveragerc
 
 lint:
   stage: test
-  image: python:3.6-buster
   script:
     - *test_setup  # expand `&test_setup` anchor above into here.
     - flake8
 
 typecheck:
   stage: test
-  image: python:3.6-buster
   script:
-    - *test_setup
+    - *test_setup  # expand `&test_setup` anchor above into here.
     - mypy

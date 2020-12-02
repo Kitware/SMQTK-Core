@@ -1,11 +1,11 @@
 """
 Utility functions pertaining to python dictionaries.
 """
-
 import copy
+from typing import Dict
 
 
-def merge_dict(a, b, deep_copy=False):
+def merge_dict(a: Dict, b: Dict, deep_copy: bool = False) -> Dict:
     """
     Merge dictionary b into dictionary a.
 
@@ -19,17 +19,11 @@ def merge_dict(a, b, deep_copy=False):
     values from ``b`` to be deep-copied into ``a``.
 
     :param a: The "base" dictionary that is updated in place.
-    :type a: dict
-
     :param b: The dictionary to merge into ``a`` recursively.
-    :type b: dict
-
-    :param deep_copy: Optionally deep-copy values from ``b`` when assigning into
-        ``a``.
-    :type deep_copy: bool
+    :param deep_copy: Optionally deep-copy values from ``b`` when assigning
+        into ``a``.
 
     :return: ``a`` dictionary after merger (not a copy).
-    :rtype: dict
 
     """
     for k in b:

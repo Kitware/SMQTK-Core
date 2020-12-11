@@ -1,0 +1,56 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI Unittests
+
+# Controls when the action will run.
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  schedule:
+    # Nightly run unit tests to check for implicit dependency issues between pull requests.
+    - cron: '0 0 * * *'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build_test:
+    # Running in containers, so this unknown environment is fine.
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8, 3.9]
+      # We want all python versions tested even if one of them happens to fail
+      fail-fast: false
+
+    container: python:${{ matrix.python-version }}
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: Container setup
+        run: apt-get -y update
+
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Versions of things used here
+        run: |
+          command -v python
+          python --version
+          pip --version
+
+      - name: Pip install requirements
+        run: pip install -r requirements.txt
+
+      - name: Run Unittests
+        run: pytest --cov=smqtk_core --cov-config=.pytest.coveragerc

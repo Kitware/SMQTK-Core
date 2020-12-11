@@ -38,7 +38,6 @@ jobs:
       - name: Container setup
         run: |
           apt-get -y update
-          apt-get -y install cmake
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
@@ -55,4 +54,4 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Run Unittests
-        run: python setup.py test
+        run: pytest --cov=smqtk_core --cov-config=.pytest.coveragerc

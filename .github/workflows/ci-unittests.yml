@@ -52,7 +52,7 @@ jobs:
           pip --version
 
       - name: Pip install requirements
-        run: pip install -r requirements.txt -r requirements.test.txt
+        run: pip install -r requirements.txt
 
       - name: Run Unittests
         run: python setup.py test

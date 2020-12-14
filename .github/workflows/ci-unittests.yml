@@ -19,7 +19,49 @@ on:
   workflow_dispatch:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
+# NOTE: Github actions does not support anchors apparently. Forgive duplication of job
+#       steps.
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    container: python:3.6
+    steps:
+      - name: Container setup
+        run: apt-get -y update
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Versions of things used here
+        run: |
+          command -v python
+          python --version
+          pip --version
+      - name: Pip install requirements
+        run: pip install -r requirements.txt
+      - name: Lint with Flake8
+        run: flake8
+
+  typecheck:
+    runs-on: ubuntu-latest
+    container: python:3.6
+    steps:
+      - name: Container setup
+        run: apt-get -y update
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Versions of things used here
+        run: |
+          command -v python
+          python --version
+          pip --version
+      - name: Pip install requirements
+        run: pip install -r requirements.txt
+      - name: Typecheck with MyPy
+        run: mypy
+
   # This workflow contains a single job called "build"
   build_test:
     # Running in containers, so this unknown environment is fine.
@@ -54,3 +96,4 @@ jobs:
 
       - name: Run Unittests
         run: pytest --cov=smqtk_core --cov-config=.pytest.coveragerc
+

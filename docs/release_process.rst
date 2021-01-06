@@ -57,8 +57,7 @@ and functionalities.
    this branch until the issue is resolved.
 3. Tag branch (see `Tag new version`_ below) after resolving issues and before
    merging into ``master``.
-4. Reset the release branch (--hard) to point to the new branch/tag.
-5. Merge version bump branch into the ``master`` branch.
+4. Merge version bump branch into the ``master`` branch.
 
 Tag new version
 ---------------

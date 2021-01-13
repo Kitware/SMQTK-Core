@@ -44,7 +44,7 @@ and functionalities.
    like ``release-[major,minor]-{NEW_VERSION}``.
 
   a) Increment the version number in the ``__version__`` value, defined in
-  ``smqtk_core/__init__.py``.
+     ``smqtk_core/__init__.py``.
   b) Rename the ``docs/release_notes/pending_release.rst`` file to
      ``docs/release_notes/v{VERSION}.rst``, matching the value in the
      ``VERSION`` file.  Add a descriptive paragraph under the title section

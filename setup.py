@@ -146,6 +146,7 @@ if __name__ == "__main__":
             'Programming Language :: Python :: 3.6',
             'Programming Language :: Python :: 3.7',
             'Programming Language :: Python :: 3.8',
+            'Programming Language :: Python :: 3.9',
         ],
         platforms=[
             'Linux',
@@ -162,6 +163,7 @@ if __name__ == "__main__":
 
         install_requires=[],
         extras_require={
+            'ci': parse_req_strip_version(SETUP_DIR / "requirements" / "ci.txt"),
             'docs': parse_req_strip_version(SETUP_DIR / "requirements" / "docs.txt"),
             'test': parse_req_strip_version(SETUP_DIR / "requirements" / "test.txt"),
         }

@@ -5,6 +5,12 @@ SMQTK-Core Pending Release Notes
 Updates / New Features
 ----------------------
 
+Interfaces
+
+* Added a new :class:`~.smqtk_core.Plugfigurable` class that provides a
+  convenient handle to inherit from both :class:`.Pluggable` and
+  :class:`.Configurable` at the same time.
+
 CI
 
 * Updated gitlab CI rules to trigger the test jobs during merge requests, tag
@@ -19,6 +25,11 @@ CI
 
 Fixes
 -----
+
+Docs
+
+* Minor fixes to the `sphinx_server.py` helper tool: Removed a watch to a
+  directory that does not exist.
 
 Misc.
 

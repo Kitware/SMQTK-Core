@@ -4,11 +4,8 @@ stages:
 # Global default parameters set for all jobs unless overridden by job-specific
 # configuration.
 default:
-  image: python:3.6-buster
-  tags:
-    - linux
-    - docker
-    - test
+  image: python:3.9-buster
+  interruptible: true
 
 # Global default variables set for all jobs unless overridden by job-specific
 # configuration.
@@ -16,48 +13,68 @@ variables:
   LC_ALL: "C.UTF-8"
   LANG: "C.UTF-8"
 
+# Common job specification not otherwise specifiable in the `default` section
+# above.
+.test_job_defaults:
+  stage: test
+  tags:
+    - linux
+    - docker
+    - test
+  rules:
+    # Enable tests when running:
+    #   - a merge-request pipeline.
+    #   - tag builds
+    #   - branch pipelines when the branch pipeline is for the default branch
+    - if: $CI_MERGE_REQUEST_IID
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - when: never  # explicit fail-exclude terminal condition.
+
 # Common setup script lines for test jobs
 .test_setup: &test_setup
   - apt-get -y update
   - python --version
   - pip install -U pip
-  - pip install --use-feature=2020-resolver
-                -r requirements.txt
+  - pip install -r requirements.txt
                 -e .
+
+.pytest_cmd: &pytest_cmd
+  - pytest --cov=smqtk_core --cov-config=.pytest.coveragerc
 
 
 ###############################################################################
 # Jobs
 
-test:py36:
-  stage: test
-  # See "default:" above for implicitly included parameters.
+test:docs_build:
+  extends: .test_job_defaults
   script:
     - *test_setup  # expand `&test_setup` anchor above into here.
-    - pytest --cov=smqtk_core --cov-config=.pytest.coveragerc
+    - cd docs
+    - make html
+    - stat _build/html/index.html
 
-test:py37:
-  stage: test
-  image: python:3.7-buster
+test:unittests:
+  extends: .test_job_defaults
+  parallel:
+    matrix:
+      - IMAGE: ["python:3.6-buster",
+                "python:3.7-buster",
+                "python:3.8-buster",
+                "python:3.9-buster"]
+  image: $IMAGE
   script:
     - *test_setup  # expand `&test_setup` anchor above into here.
-    - pytest --cov=smqtk_core --cov-config=.pytest.coveragerc
+    - *pytest_cmd
 
-test:py38:
-  stage: test
-  image: python:3.8-buster
-  script:
-    - *test_setup  # expand `&test_setup` anchor above into here.
-    - pytest --cov=smqtk_core --cov-config=.pytest.coveragerc
-
-lint:
-  stage: test
+test:lint:
+  extends: .test_job_defaults
   script:
     - *test_setup  # expand `&test_setup` anchor above into here.
     - flake8
 
-typecheck:
-  stage: test
+test:typecheck:
+  extends: .test_job_defaults
   script:
-    - *test_setup  # expand `&test_setup` anchor above into here.
+    - *test_setup
     - mypy

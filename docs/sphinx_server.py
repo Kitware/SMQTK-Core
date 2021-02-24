@@ -19,7 +19,6 @@ rebuild_root = "_build/html"
 
 watch_dirs = [
     '.',
-    'architecture',
     'release_notes',
 ]
 

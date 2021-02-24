@@ -116,19 +116,34 @@ need to at a minimum implement the
 See this method's doc-string for more details.
 
 
-Example: Creating an Interface and Exposing Implementations
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The combination: :class:`~smqtk_core.Plugfigurable`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+It will likely be desirable to utilize both the :class:`.Pluggable` and
+:class:`.Configurable` mixins when constructing your own new interfaces.
+To facilitate this, and to reduce excessive typing, we provide the
+:class:`.Plugfigurable` helper class.
+This class does not add or change any functionality.
+It is merely a convenience to indicate the combined inheritance.
+
+
+Examples
+^^^^^^^^
+
+Creating an Interface and Exposing Implementations
+""""""""""""""""""""""""""""""""""""""""""""""""""
 ..
    define an interface extending Pluggable & Configurable with 1 abs method
      should be in one module.
    define dumb impl in another module
    expose implementation via entry point ext in setup.py
 
-In this example, we will show a simple interface definition that inherits from
-both :class:`~smqtk_core.plugin.Pluggable` and
-:class:`~smqtk_core.configuration.Configurable`, a sample implementation that
-is defined in a different module, and the subsequent exposure of that
-implementation via a python package's entry point extensions.
+In this example, we will show:
+  * A simple interface definition that inherits from both :class:`.Pluggable`
+    and :class:`.Configurable` via the convenient :class:`.Plugfigurable`
+    class.
+  * A sample implementation that is defined in a different module.
+  * The subsequent exposure of that implementation via a python package's entry
+    point extensions.
 
 Let's start with the example interface definition which, let's say, is defined
 in the :file:`MyPackage.interface` module of our hypothetical :mod:`MyPackage`
@@ -138,9 +153,12 @@ package:
 
    # File: MyPackage/interface.py
    import abc
-   from smqtk_core import Configurable, Pluggable
+   from smqtk_core import Plugfigurable
 
-   class MyInterface(Configurable, Pluggable):
+   class MyInterface(Plugfigurable):
+       """
+       A new interface that transitively inherits from Pluggable and Configurable.
+       """
 
        @abc.abstractmethod
        def my_behavior(self, x: str) -> int:
@@ -156,6 +174,7 @@ definition of an "implementation" (see
 
    # File: MyPackage/implementation.py
    from MyPackage.interface import MyInterface
+   from typing import Dict
 
    class MyImplementation(MyInterface):
 
@@ -164,7 +183,7 @@ definition of an "implementation" (see
            ...
 
        # Abstract methods from Configurable.
-       def get_config(self):
+       def get_config(self) -> Dict:
            # As per Configurable documentation, this should return the same
            # non-self keys as the constructor.
            return {
@@ -215,12 +234,17 @@ module.
 Reference
 ^^^^^^^^^
 
+:mod:`smqtk_core`
+"""""""""""""""""
+.. automodule:: smqtk_core
+   :members:
+
 :mod:`smqtk_core.plugin`
-"""""""""""""""""""""""""
+""""""""""""""""""""""""
 .. automodule:: smqtk_core.plugin
    :members:
 
 :mod:`smqtk_core.configuration`
-""""""""""""""""""""""""""""""""
+"""""""""""""""""""""""""""""""
 .. automodule:: smqtk_core.configuration
    :members:

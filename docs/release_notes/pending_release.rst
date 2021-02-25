@@ -35,3 +35,5 @@ Misc.
 
 * Fixed `MANIFEST.in.in` file to not include a no-longer-present file and to
   include all `requirements/*.txt` files.
+
+* Removed unnecessary `.dockerignore` file.

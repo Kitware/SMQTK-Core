@@ -116,10 +116,10 @@ def parse_req_strip_version(filepath: Union[str, Path]) -> List[str]:
 PACKAGE_NAME = "smqtk_core"
 SETUP_DIR = Path(__file__).parent
 
-with open(SETUP_DIR / 'README.md') as f:
+with open(SETUP_DIR / "README.md") as f:
     LONG_DESCRIPTION = f.read()
 
-VERSION = parse_version(SETUP_DIR / "smqtk_core" / "__init__.py")
+VERSION = parse_version(SETUP_DIR / PACKAGE_NAME / "__init__.py")
 
 
 if __name__ == "__main__":

@@ -44,7 +44,7 @@ and functionalities.
 1. Create a new branch off of the ``master`` named something like
    ``release-[major,minor]-{NEW_VERSION}``.
 
-  a. Increment patch value in  ``python/smqtk/__init__.py`` file's
+  a. Increment patch value in  ``smqtk_core/__init__.py`` file's
      ``__version__`` attribute.
   b. Rename the ``docs/release_notes/pending_release.rst`` file to
      ``docs/release_notes/v{VERSION}.rst``, matching the value in the

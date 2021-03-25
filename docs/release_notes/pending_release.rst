@@ -9,6 +9,8 @@ Misc.
 
 * Now standardize to using `Poetry`_ for environment/build/publish management.
 
+  * Collapsed pytest configuration into the :file:`pyproject.toml` file.
+
 * Add explicit ReadTheDocs configuration file :file:`.readthedocs.yaml`.
 
 

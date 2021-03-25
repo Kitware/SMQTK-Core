@@ -2,6 +2,7 @@
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
+###############################################################################
 [tool.poetry]
 name = "smqtk-core"
 # REMEMBER: `distutils.version.*Version` types can be used to compare versions
@@ -50,3 +51,22 @@ livereload = "^2.6.3"
 coverage = "^5.5"
 pytest = "^6.2.2"
 pytest-cov = "^2.11.1"
+
+###############################################################################
+[tool.pytest.ini_options]
+addopts = [
+    "-lv",                  # Show local in trace-backs.
+    "--doctest-modules",    # Increased verbosity.
+    "--tb=long",            # Trace-back print mode.
+]
+testpaths = [
+    "tests",
+    "smqtk_core",
+]
+norecursedirs = [
+    "tests/test_plugin_dir"
+]
+doctest_optionflags = [
+    "NORMALIZE_WHITESPACE",
+    "IGNORE_EXCEPTION_DETAIL",
+]

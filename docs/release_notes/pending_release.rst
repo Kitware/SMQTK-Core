@@ -13,6 +13,10 @@ Misc.
 Fixes
 -----
 
+CI
+
+* Update CI configurations to use `Poetry`_.
+
 Docs
 
 * Fix incorrect filepath relative to this repository in the release process

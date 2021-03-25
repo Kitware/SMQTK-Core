@@ -40,6 +40,7 @@ flake8 = "^3.9.0"
 flake8-mutable = "^1.2.0"
 mypy = "^0.812"
 # Docs
+# - Also see: `docs/readthedocs-reqs.txt` for use by RTD
 Sphinx = "^3.5.3"
 sphinx-rtd-theme = "^0.5.1"
 sphinx-argparse = "^0.2.5"

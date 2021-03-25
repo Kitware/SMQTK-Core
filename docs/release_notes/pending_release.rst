@@ -9,6 +9,8 @@ Misc.
 
 * Now standardize to using `Poetry`_ for environment/build/publish management.
 
+* Add explicit ReadTheDocs configuration file :file:`.readthedocs.yaml`.
+
 
 Fixes
 -----

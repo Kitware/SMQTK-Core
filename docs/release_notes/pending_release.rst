@@ -11,6 +11,8 @@ Misc.
 
   * Collapsed pytest configuration into the :file:`pyproject.toml` file.
 
+  * Updated release process documentation to reflect the use of Poetry.
+
 * Add explicit ReadTheDocs configuration file :file:`.readthedocs.yaml`.
 
 

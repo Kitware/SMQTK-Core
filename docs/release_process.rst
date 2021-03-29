@@ -25,16 +25,23 @@ As such, patch releases should only ever be based on an existing release point.
    like ``release-patch-{NEW_VERSION}``, where ``NEW_VERSION`` is an increase
    in the ``Z`` version component.
 
-  a. Increment patch value in ``python/smqtk/__init__.py`` file's
-     ``__version__`` attribute.
+  a. Use ``poetry version patch`` to increase the patch value appropriately in
+     the :file:`pyproject.toml` file.
   b. Rename the ``docs/release_notes/pending_patch.rst`` file to
-     ``docs/release_notes/v{VERSION}.rst``, matching the value in the
-     ``__version__`` attribute.  Add a descriptive paragraph under the title
-     section summarizing this release.
-  c. Add new release notes RST file reference to ``docs/release_notes.rst``.
+     ``docs/release_notes/v{VERSION}.rst``, matching the new version value.
+     Add a descriptive paragraph under the title section summarizing this
+     release.
+  c. Add a reference to the new release notes RST file in
+     ``docs/release_notes.rst``.
 
-2. Tag branch (see `Tag new version`_ below ).
-3. Merge version bump branch into ``master`` branch.
+2. Create a pull/merge request for this branch with master as the merge target.
+   This is to ensure that everything passes CI testing before making the
+   release. If there is an issue then branches should be made and merged into
+   this branch until the issue is resolved.
+3. Tag branch (see `Tag new version`_ below ) after resolving issues and before
+   merging into ``master``.
+4. Merge version bump branch into ``master`` branch.
+5. `Create new version release to PYPI`_
 
 Major and Minor Releases
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -46,11 +53,14 @@ and functionalities.
 
   a. Increment patch value in  ``smqtk_core/__init__.py`` file's
      ``__version__`` attribute.
+    * See `Poetry's version command`_ for a convenient means of incrementing
+      the version.
   b. Rename the ``docs/release_notes/pending_release.rst`` file to
-     ``docs/release_notes/v{VERSION}.rst``, matching the value in the
-     ``__version__`` file.  Add a descriptive paragraph under the title section
-     summarizing this release.
-  c. Add new release notes RST file reference to ``docs/release_notes.rst``.
+     ``docs/release_notes/v{VERSION}.rst``, matching the new version value.
+     Add a descriptive paragraph under the title section summarizing this
+     release.
+  c. Add a reference to the new release notes RST file in
+     ``docs/release_notes.rst``.
 
 2. Create a pull/merge request for this branch with master as the merge target.
    This is to ensure that everything passes CI testing before making the
@@ -59,6 +69,7 @@ and functionalities.
 3. Tag branch (see `Tag new version`_ below) after resolving issues and before
    merging into ``master``.
 4. Merge version bump branch into the ``master`` branch.
+5. `Create new version release to PYPI`_
 
 Tag new version
 ---------------
@@ -92,8 +103,7 @@ Create a new git tag using the new version number (format:
 merger::
     $ git tag -a -m "[Major|Minor|Patch] release v#.#.#"
 
-Push this new tag to GitHub (assuming origin remote points to `SMQTK on
-GitHub`_::
+Push this new tag to GitHub (or appropriate remote)::
     $ git push origin v#.#.#
 
 To add the release notes to GitHub, navigate to the `tags page on GitHub`_
@@ -103,27 +113,29 @@ number should be used as the release title.
 
 Create new version release to PYPI
 ----------------------------------
-Make sure the source is checked out on the newest version tag, the repo is
-clean (no uncommited files/edits), and the ``build`` and ``dist`` directories
-are removed::
+
+__ https://python-poetry.org/docs/repositories/#configuring-credentials
+
+We will use Poetry again to perform package building and publishing.
+See `this documentation`__ on how to set and store your PYPA credentials in Poetry.
+
+Make sure the source is checked out on the appropriate  version tag, the repo
+is clean (no uncommited files/edits). ``git clean`` may help ensure a clean
+state::
+
     $ git checkout <VERSION_TAG>
-    $ rm -r dist python/smqtk.egg-info
+    $ git clean -xdi  # NOTE: `-i` makes this an interactive command.
 
-Create the ``build`` and ``dist`` files for the current version with the
-following command(s) from the source tree root directory::
-    $ python setup.py sdist
+Build source and wheel packages for the current version::
 
-Make sure your ``$HOME/.pypirc`` file is up-to-date and includes the following
-section with your username/password::
-    [pypi]
-    username = <username>
-    password = <password>
+    $ poetry build
 
-Make sure the ``twine`` python package is installed and is up-to-date and then
-upload dist packages created with::
-    $ twine upload dist/*
+The files in `./dist/` may be inspected for correctness before publishing to
+PYPA with::
+
+    $ poetry publish
 
 
-.. _SMQTK on GitHub: https://github.com/Kitware/SMQTK
-.. _releases page on GitHub: https://github.com/Kitware/SMQTK/releases
-.. _tags page on GitHub: https://github.com/Kitware/SMQTK/tags
+.. _Poetry's version command: https://python-poetry.org/docs/cli/#version
+.. _releases page on GitHub: https://github.com/Kitware/SMQTK-Core/releases
+.. _tags page on GitHub: https://github.com/Kitware/SMQTK-Core/tags

@@ -131,12 +131,6 @@ Examples
 
 Creating an Interface and Exposing Implementations
 """"""""""""""""""""""""""""""""""""""""""""""""""
-..
-   define an interface extending Pluggable & Configurable with 1 abs method
-     should be in one module.
-   define dumb impl in another module
-   expose implementation via entry point ext in setup.py
-
 In this example, we will show:
   * A simple interface definition that inherits from both :class:`.Pluggable`
     and :class:`.Configurable` via the convenient :class:`.Plugfigurable`
@@ -180,6 +174,7 @@ definition of an "implementation" (see
 
        def __init__(self, paramA: int = 1, paramB: int = 2) -> None:
            """Implementation constructor."""
+           super().__init__()  # at least imposed by Pluggable parent class.
            ...
 
        # Abstract methods from Configurable.
@@ -196,22 +191,17 @@ definition of an "implementation" (see
            """My fancy implementation."""
            ...
 
-Lastly, our implementation should be exposed via our package's :file:`setup.py`
-entry points extensions, using the ``smqtk_plugins`` key, as inherited from the
-base :class:`~smqtk_core.plugin.Pluggable` mixin, like the following:
+Lastly, our implementation should be exposed via our package's
+:file:`pyproject.toml` Poetry plugins section, using the ``smqtk_plugins`` key,
+as inherited from the base :class:`~smqtk_core.plugin.Pluggable` mixin, like
+the following:
 
-.. code-block:: python
-
-   from setuptools import setup
+.. code-block:: toml
 
    ...
 
-   setup(
-       ...
-       entry_points={
-           "smqtk_plugins": "my_plugins = MyPackage.implementation"
-       }
-   )
+   [tool.poetry.plugins."smqtk_plugins"]
+   "my_plugins" = "MyPackage.implementation"
 
 Now, this implementation will show up as an available implementation of the
 interface class:
@@ -220,7 +210,7 @@ interface class:
 
    >>> from MyPackage.interface import MyInterface
    >>> MyInterface.get_impls()
-   set([..., MyPackage.implementation.MyImplementation, ...])
+   {<class 'MyPackage.implementation.MyImplementation'>}
 
 The :class:`MyImplementation` class above should also be all set for
 configuration because it defines the one required abstract method

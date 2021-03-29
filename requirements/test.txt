@@ -1,6 +1,0 @@
-# This is an implicit value, here for clarity
---index-url https://pypi.python.org/simple/
-
-coverage==5.4
-pytest==6.2.2
-pytest-cov==2.11.1

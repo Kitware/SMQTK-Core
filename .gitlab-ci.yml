@@ -21,6 +21,7 @@ variables:
     - linux
     - docker
     - test
+    - smqtk
   rules:
     # Enable tests when running:
     #   - a merge-request pipeline.
@@ -33,14 +34,15 @@ variables:
 
 # Common setup script lines for test jobs
 .test_setup: &test_setup
-  - apt-get -y update
+  - export PATH=${HOME}/.local/bin:${PATH}
+  - pip install --user -U poetry
+  - command -v python
   - python --version
-  - pip install -U pip
-  - pip install -r requirements.txt
-                -e .
-
-.pytest_cmd: &pytest_cmd
-  - pytest --cov=smqtk_core --cov-config=.pytest.coveragerc
+  - command -v pip
+  - pip --version
+  - command -v poetry
+  - poetry -V
+  - poetry install
 
 
 ###############################################################################
@@ -51,8 +53,20 @@ test:docs_build:
   script:
     - *test_setup  # expand `&test_setup` anchor above into here.
     - cd docs
-    - make html
+    - poetry run make html
     - stat _build/html/index.html
+
+test:lint:
+  extends: .test_job_defaults
+  script:
+    - *test_setup  # expand `&test_setup` anchor above into here.
+    - poetry run flake8
+
+test:typecheck:
+  extends: .test_job_defaults
+  script:
+    - *test_setup
+    - poetry run mypy
 
 test:unittests:
   extends: .test_job_defaults
@@ -65,16 +79,4 @@ test:unittests:
   image: $IMAGE
   script:
     - *test_setup  # expand `&test_setup` anchor above into here.
-    - *pytest_cmd
-
-test:lint:
-  extends: .test_job_defaults
-  script:
-    - *test_setup  # expand `&test_setup` anchor above into here.
-    - flake8
-
-test:typecheck:
-  extends: .test_job_defaults
-  script:
-    - *test_setup
-    - mypy
+    - poetry run pytest --cov=smqtk_core --cov-config=.pytest.coveragerc

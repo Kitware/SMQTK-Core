@@ -6,7 +6,7 @@ See the [SMQTK-Core README] file for additional information.
 
 ## The General Process
 
-1.  The official SMQTK-Core source is maintained on Github
+1.  The official SMQTK-Core source is maintained on Github.
 
 2.  Fork SMQTK-Core into your user's namespace and clone this repository
     on your system.

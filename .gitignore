@@ -1,3 +1,6 @@
+# This package considers itself as a library.
+/poetry.lock
+
 ### Python template
 # Byte-compiled / optimized / DLL files
 __pycache__/

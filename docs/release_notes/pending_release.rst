@@ -28,5 +28,7 @@ Docs
 * Fix incorrect filepath relative to this repository in the release process
   documentation.
 
+* Fix for use with poetry where appropriate.
+
 
 .. _Poetry: https://python-poetry.org/

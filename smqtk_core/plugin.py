@@ -44,7 +44,7 @@ import logging
 import os
 import pkg_resources
 import types
-from typing import cast, Collection, FrozenSet, Set, Type, TypeVar
+from typing import cast, Any, Collection, FrozenSet, Set, Type, TypeVar
 
 # Environment variable *PATH separator for the current platform.
 OS_ENV_PATH_SEP = os.pathsep
@@ -348,7 +348,24 @@ class NotUsableError(Exception):
 
 class Pluggable(metaclass=abc.ABCMeta):
     """
-    Interface for classes that have plugin implementations
+    Interface for classes that have plugin implementations.
+
+    This mixin class adds an assertive check during instance construction that
+    the derived type is "usable" by invoking it's `is_usable()` class-method
+    within this type's `__new__` method.
+    This is happening in `__new__` specifically for a couple reasons:
+
+        * Sub-classes do not have to explicitly invoke super to inherit this
+          safety functionality.
+
+        * Unblocks certain type-checking situations involving multiple
+          inheritance and behavior as a mixin.
+
+    **NOTE:** In a multiple inheritance scenario with another type that also
+    implements `__new__`, this class should be listed to the right-hand-side
+    so as to be later in the MRO. Otherwise, this will cut off arguments from
+    being to the super `__new__` as we simply consider the locally parent type
+    of `object` when calling our `super().__new__`.
     """
 
     __slots__ = ()
@@ -413,9 +430,17 @@ class Pluggable(metaclass=abc.ABCMeta):
         """
         return True
 
-    def __init__(self) -> None:
-        if not self.is_usable():
+    def __new__(cls: Type[P], *args: Any, **kwargs: Any) -> P:
+        # This needs to take in *args/**kwargs as a basic (not-new-overriding)
+        # subclass scenario will see it's constructor args passed here.
+        # Requiring all inheriting classes to define a __new__ for parameter
+        # translation is unacceptable.
+        if not cls.is_usable():
             raise NotUsableError(
                 "Implementation class '%s' is not currently "
-                "usable." % self.__class__.__name__
+                "usable." % cls.__name__
             )
+        # If we're used in multiple inheritance, pass along inputs, otherwise
+        # we'll receive a TypeError from `object.__new__` which does not take
+        # any parameters besides `cls`.
+        return super().__new__(cls)

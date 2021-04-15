@@ -5,6 +5,12 @@ SMQTK-Core Pending Release Notes
 Updates / New Features
 ----------------------
 
+Pluggable
+
+* Removed `__init__` method and added a `__new__` in its place. The behavior is
+  the same, but is now less fragile from override and addresses some issues
+  with type-checking during some multiple inheritance situations.
+
 Misc.
 
 * Now standardize to using `Poetry`_ for environment/build/publish management.

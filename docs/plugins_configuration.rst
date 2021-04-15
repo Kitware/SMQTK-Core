@@ -174,7 +174,6 @@ definition of an "implementation" (see
 
        def __init__(self, paramA: int = 1, paramB: int = 2) -> None:
            """Implementation constructor."""
-           super().__init__()  # at least imposed by Pluggable parent class.
            ...
 
        # Abstract methods from Configurable.

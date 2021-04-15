@@ -3,7 +3,7 @@ import abc
 import os
 import pkg_resources
 import types
-from typing import cast
+from typing import cast, Any, Type, TypeVar
 from unittest import mock
 
 import pytest
@@ -46,10 +46,56 @@ EMPTY_DIST = pkg_resources.Distribution(
     project_name="tests", version="test"
 )
 
+# Classes for testing multiple inheritance situations.
+# Having them up here instead of in test classes for successful type annotation
+# for typechecking.
+I2_T = TypeVar("I2_T", bound="I2")
+I3_T = TypeVar("I3_T", bound="I3")
+I4_T = TypeVar("I4_T", bound="I4")
+
+
+class I1:
+    """ Separate simple interface. """
+    def __init__(self, a: int, b: int):
+        self.x = (a, b)
+
+
+class I2:
+    """ Separate interface with __new__, base-classed on left. """
+    def __new__(cls: Type[I2_T], *args: Any, **kwargs: Any) -> I2_T:
+        assert args == (1, 2)
+        assert kwargs == {}
+        # Local parent is object, so nothing to pass on.
+        return super().__new__(cls)
+
+    def __init__(self, a: int, b: int):
+        self.x = (a, b)
+
+
+class I3:
+    """ Separate interface with __new__, base-classed on right. """
+    def __new__(cls: Type[I3_T], *args: Any, **kwargs: Any) -> I3_T:
+        assert args == ()
+        assert kwargs == {}
+        # Local parent is object, so nothing to pass on.
+        return super().__new__(cls)
+
+    def __init__(self, a: int, b: int):
+        self.x = (a, b)
+
+
+class I4 (Pluggable):
+    def __new__(cls: Type[I4_T], *args: Any, **kwargs: Any) -> I4_T:
+        assert args == (1, 2)
+        assert kwargs == {}
+        return super().__new__(cls)
+
+    def __init__(self, a: int, b: int):
+        self.x = (a, b)
+
 
 ###############################################################################
 # Tests
-
 
 class TestIsValidPlugin:
     def test_not_different_type(self) -> None:
@@ -474,3 +520,94 @@ class TestPluggable:
             match=r"Implementation class '\w+' is not currently usable\."
         ):
             NotUsable()
+
+    def test_multiple_inheritance_alone_right(self) -> None:
+        """
+        Test that when Pluggable is used in multiple inheritance with another
+        class that *does not* implement __new__, and is to the right of the
+        other type, the derivative type successfully constructs.
+        """
+        class D (I1, Pluggable):
+            def __new__(cls, *args: Any, **kwargs: Any) -> "D":
+                assert args == (1, 2)
+                assert kwargs == {}
+                return super().__new__(cls, *args, **kwargs)
+
+            def foo(self) -> int:
+                return sum(self.x)
+
+        assert D(1, 2).foo() == 3
+
+    def test_multiple_inheritance_alone_left(self) -> None:
+        """
+        Test that when Pluggable is used in multiple inheritance with another
+        class that *does not* implement __new__, and is to the left of the
+        other type, the derivative type successfully constructs.
+        """
+        class D (Pluggable, I1):
+            def __new__(cls, *args: Any, **kwargs: Any) -> "D":
+                assert args == (1, 2)
+                assert kwargs == {}
+                return super().__new__(cls, *args, **kwargs)
+
+            def foo(self) -> int:
+                return sum(self.x)
+
+        assert D(1, 2).foo() == 3
+
+    def test_multiple_inheritance_dual_right(self) -> None:
+        """
+        Test that when Pluggable is used in multiple inheritance with another
+        class that implements __new__, and is to the right of the other type,
+        the derivative type successfully constructs.
+        """
+        # Unsure why flake8 has trouble with this?
+        class D(I2, Pluggable):
+            def __new__(cls: Type["D"], *args: Any, **kwargs: Any) -> "D":  # noqa: F821
+                assert args == (1, 2)
+                assert kwargs == {}
+                return super().__new__(cls, *args, **kwargs)
+
+            def foo(self) -> int:
+                return sum(self.x)
+
+        assert D(1, 2).foo() == 3
+
+    def test_multiple_inheritance_dual_left(self) -> None:
+        """
+        Test that when Pluggable is used in multiple inheritance with another
+        class that implements a parameter-less __new__, and is to the left of
+        the other type, the other type's __new__ receives no arguments and the
+        derivative type successfully constructs.
+        """
+        # Unsure why flake8 has trouble with this?
+        class D (Pluggable, I3):
+            def __new__(cls: Type["D"], *args: Any, **kwargs: Any) -> "D":  # noqa: F821
+                assert args == (1, 2)
+                assert kwargs == {}
+                return super().__new__(cls, *args, **kwargs)
+
+            def foo(self) -> int:
+                return sum(self.x)
+
+        assert D(1, 2).foo() == 3
+
+    def test_multiple_inheritance_chain_success(self) -> None:
+        """
+        Test that when Pluggable is used in multiple inheritance with another
+        type that also inherits from pluggable, when a derivative class
+        incorrectly positions it's base classes, an appropriate TypeError is
+        raised (part of python, not our functionality).
+        """
+        # Switched base-class list is not even constructable (also throws
+        # type-check error in such a condition).
+        class D (I4, Pluggable):
+            def __new__(cls: Type["D"], *args: Any, **kwargs: Any) -> "D":  # noqa: F821
+                assert args == (1, 2)
+                assert kwargs == {}
+                return super().__new__(cls, *args, **kwargs)
+
+            def foo(self) -> int:
+                return sum(self.x)
+
+        assert D(1, 2).foo() == 3

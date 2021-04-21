@@ -1,5 +1,5 @@
-SMQTK-Core Pending Release Notes
-================================
+SMQTK-Core v0.17.0
+==================
 
 
 Updates / New Features

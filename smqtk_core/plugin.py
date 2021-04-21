@@ -351,7 +351,7 @@ class Pluggable(metaclass=abc.ABCMeta):
     Interface for classes that have plugin implementations.
 
     This mixin class adds an assertive check during instance construction that
-    the derived type is "usable" by invoking it's `is_usable()` class-method
+    the derived type is "usable" by invoking its `is_usable()` class-method
     within this type's `__new__` method.
     This is happening in `__new__` specifically for a couple reasons:
 
@@ -364,8 +364,8 @@ class Pluggable(metaclass=abc.ABCMeta):
     **NOTE:** In a multiple inheritance scenario with another type that also
     implements `__new__`, this class should be listed to the right-hand-side
     so as to be later in the MRO. Otherwise, this will cut off arguments from
-    being to the super `__new__` as we simply consider the locally parent type
-    of `object` when calling our `super().__new__`.
+    being sent to the super `__new__` as we simply consider the locally parent
+    type of `object` when calling our `super().__new__`.
     """
 
     __slots__ = ()
@@ -432,7 +432,7 @@ class Pluggable(metaclass=abc.ABCMeta):
 
     def __new__(cls: Type[P], *args: Any, **kwargs: Any) -> P:
         # This needs to take in *args/**kwargs as a basic (not-new-overriding)
-        # subclass scenario will see it's constructor args passed here.
+        # subclass scenario will see its constructor args passed here.
         # Requiring all inheriting classes to define a __new__ for parameter
         # translation is unacceptable.
         if not cls.is_usable():

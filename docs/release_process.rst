@@ -51,8 +51,8 @@ and functionalities.
 1. Create a new branch off of the ``master`` named something like
    ``release-[major,minor]-{NEW_VERSION}``.
 
-  a. Increment patch value in  ``smqtk_core/__init__.py`` file's
-     ``__version__`` attribute.
+  a. Increment patch value in  ``pyproject.toml`` file's ``version`` attribute
+     under the `[too.poetry]` section.
     * See `Poetry's version command`_ for a convenient means of incrementing
       the version.
   b. Rename the ``docs/release_notes/pending_release.rst`` file to

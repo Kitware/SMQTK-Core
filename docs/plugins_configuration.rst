@@ -190,17 +190,45 @@ definition of an "implementation" (see
            """My fancy implementation."""
            ...
 
-Lastly, our implementation should be exposed via our package's
-:file:`pyproject.toml` Poetry plugins section, using the ``smqtk_plugins`` key,
-as inherited from the base :class:`~smqtk_core.plugin.Pluggable` mixin, like
-the following:
+Lastly, our implementation should be exposed via our package's entrypoint
+metadata, using the "smqtk_plugins" namespace. This namespace value is derived
+from the base :class:`~smqtk_core.plugin.Pluggable` mixin's
+``PLUGIN_NAMESPACE`` class property.
+Entry point metadata may be specified for a package either via the
+:func:`setuptools.setup` function, the `setup.cfg` file, or, when using poetry,
+a ``[tool.poetry.plugins."..."]`` section in the :file:`pyproject.toml` file.
+The above are illustrated in the following:
 
-.. code-block:: toml
+    a) :func:`setuptools.setup` function
 
-   ...
+       .. code-block:: python
 
-   [tool.poetry.plugins."smqtk_plugins"]
-   "my_plugins" = "MyPackage.implementation"
+          from setuptools import setup
+          setup(
+              entry_points={
+                  "smqtk_plugins": [
+                      "unique_key = MyPackage.implementation",
+                      ...
+                  ]
+              }
+          )
+
+    b) The :file:`setup.cfg` file
+
+       .. code-block:: cfg
+
+          [options.entry_points]
+          smqtk_plugins =
+              unique_key = MyPackage.implementation
+              ...
+
+    c) with Poetry in the :file:`pyproject.toml` file
+
+       .. code-block:: toml
+
+          [tool.poetry.plugins."smqtk_plugins"]
+          "my_plugins" = "MyPackage.implementation"
+          ...
 
 Now, this implementation will show up as an available implementation of the
 interface class:

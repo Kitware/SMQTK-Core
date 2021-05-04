@@ -1,14 +1,17 @@
 Plugins and Configuration
 -------------------------
-SMQTK-Core provides plugin and configuration utilities to support the creation
-of interface classes that have a convenient means of accessing implementing
-types, paired ability to dynamically instantiate interface implementations
-based on a configuration derived by constructor introspection.
+The general concept of `abstract interfaces`__ allows users to create
+functionality in terms of the interface, separating the concerns of usage and
+implementation.
+This tooling is intended to enhance that concept by providing a
+straightforward way to expose and discover implementations of an interface,
+as well as factory functionality to create instances of an implementation from
+a JSON-compliant configuration structure.
+We provide two mixin classes and a number of utility functions to achieve this.
+While the two mixin classes function independently and can be utilized on their
+own, they have been designed such that their combination is symbiotic.
 
-While these two primary mixin classes function independently and can be
-utilized on their own, their combination is symbiotic and allows for users of
-derivative interfaces to create tools in terms of the interfaces and leave the
-specific selection of implementations for configuration time.
+.. __: https://en.wikipedia.org/wiki/Abstract_type
 
 .. _P&C-PluggableMixin:
 
@@ -16,9 +19,10 @@ The :class:`~smqtk_core.plugin.Pluggable` Mixin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 **Motivation:**
 We want to be able to define interfaces to generic concepts and structures
-that higher level tools can be defined around without strictly catering
-themselves to any particular implementation, while additionally allowing
-freedom in implementation variety without overly restricting implementations.
+that higher-level functionality can be defined around without strictly catering
+themselves to any particular implementation.
+We additionally want to allow freedom in implementation variety without much
+adding to the implementation burden.
 
 In SMQTK-Core, this is addressed via the :class:`~smqtk_core.plugin.Pluggable`
 abstract mixin class:
@@ -29,18 +33,15 @@ abstract mixin class:
    from smqtk_core.plugin import Pluggable
 
    class MyInterface(Pluggable):
-
        @abc.abstractmethod
        def my_behavior(self, x: str) -> int:
            """My fancy behavior."""
 
    class NumLetters(MyInterface):
-
        def my_behavior(self, x: str) -> int:
            return len(x)
 
    class IntCast(MyInterface):
-
        def my_behavior(self, x: str) -> int:
            return int(x)
 
@@ -51,20 +52,29 @@ abstract mixin class:
        for t in impl_types:
            print(f"- {t.__name__}")
 
-The above prints would then output::
+Running the above in a ``.py`` file would then output::
 
     MyInterface implementations:
     - NumLetters
     - IntCast
 
+This is of course a naive example where implementations are defined
+right next to the interface.
+This is not a requirement.
+Implementations may be spread out across other sub-modules within a package, or
+even in other packages.
+In the below section, `Plugin Discovery Methods`_, and in the example
+`Creating an Interface and Exposing Implementations`_, we will show how to
+expose implementations of a plugin-enabled interface.
 
 .. _P&C-Pluggable-InterfaceVsImplementation:
 
 Interfaces vs. Implementations
 """"""""""""""""""""""""""""""
 Classes that inherit from the :class:`~smqtk_core.plugin.Pluggable`
-mixin are considered either pluggable interfaces or plugin implementations
-depending on whether they fully implement abstract methods.
+mixin are considered either plugin implementations, or further pluggable
+interfaces, depending on whether they fully implement
+abstract methods or not, respectively.
 
 
 Plugin Discovery Methods
@@ -113,17 +123,22 @@ configuration input/output.
 Classes that inherit from :class:`~smqtk_core.configuration.Configurable` *do*
 need to at a minimum implement the
 :meth:`~smqtk_core.configuration.Configurable.get_config` instance method.
+This is due to currently lacking the ability to introspect the connection
+between constructor parameters and how those values are retained in the class.
 See this method's doc-string for more details.
 
 
-The combination: :class:`~smqtk_core.Plugfigurable`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The Convenient Combination: :class:`~smqtk_core.Plugfigurable`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 It will likely be desirable to utilize both the :class:`.Pluggable` and
 :class:`.Configurable` mixins when constructing your own new interfaces.
 To facilitate this, and to reduce excessive typing, we provide the
 :class:`.Plugfigurable` helper class.
 This class does not add or change any functionality.
-It is merely a convenience to indicate the combined inheritance.
+It is merely a convenience to indicate the multiply inherit from both mixin
+types.
+Also regarding multiple in inheritance, either :class:`.Pluggable' nor
+:class:`.Configurable` define a `__init__` method, so
 
 
 Examples
@@ -176,7 +191,7 @@ definition of an "implementation" (see
            """Implementation constructor."""
            ...
 
-       # Abstract methods from Configurable.
+       # Abstract method from the Configurable mixin.
        def get_config(self) -> Dict:
            # As per Configurable documentation, this should return the same
            # non-self keys as the constructor.
@@ -197,7 +212,7 @@ from the base :class:`~smqtk_core.plugin.Pluggable` mixin's
 Entry point metadata may be specified for a package either via the
 :func:`setuptools.setup` function, the `setup.cfg` file, or, when using poetry,
 a ``[tool.poetry.plugins."..."]`` section in the :file:`pyproject.toml` file.
-The above are illustrated in the following:
+This is illustrated in the following:
 
     a) :func:`setuptools.setup` function
 
@@ -243,9 +258,10 @@ The :class:`MyImplementation` class above should also be all set for
 configuration because it defines the one required abstract method
 :meth:`~smqtk_core.configuration.Configurable.get_config` and because it's
 constructor is only anticipating JSON-compliant data-types.
-If more complicated types are desired by the constructor, additional methods
-would need to be overridden as defined in the :mod:`smqtk_core.configuration`
-module.
+If more complicated types are desired by the constructor, that is completely
+OK!
+In such cases, additional methods would need to be overridden as defined in the
+:mod:`smqtk_core.configuration` module.
 
 
 Reference

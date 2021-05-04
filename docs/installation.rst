@@ -4,7 +4,10 @@ Installation
 There are two ways to get ahold of SMQTK-Core.
 The simplest is to install via the :command:`pip` command.
 Alternatively, the source tree can be acquired and be locally developed using
-`Poetry`_ (`installation`_ and `usage`_).
+`Poetry`_.
+
+For more information on the use of `Poetry`_, follow these links fr
+`installation`_ and `usage`_ documentation.
 
 .. _installation: Poetry-installation_
 .. _usage: Poetry-usage_
@@ -36,7 +39,9 @@ Quick Start
     cd /where/things/should/go/
     git clone https://github.com/Kitware/smqtk-core.git ./
     poetry install
+    # Since we're from source we can test the installation.
     poetry run pytest
+    # We can also build the local documentation as it may be more up to date then ReadTheDocs.
     cd docs
     make html
 
@@ -44,17 +49,18 @@ Quick Start
 Installing Python dependencies
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 This project uses `Poetry`_ for depedency management, environment consistency,
-package building, version management and publishing to PYPI.
-Dependencies are `abstractly defined`_ in the :file:`pyproject.toml` file, as
-well as `specifically pinned versions`_ in the :file:`poetry.lock` file, both
-of which can be found in the root of the source tree.
+version management, package building and publishing to PYPI.
+Dependencies are `abstractly defined`_ in the :file:`pyproject.toml` file.
+Additionally, `specifically pinned versions`_ are specified in the
+:file:`poetry.lock` file for *development* environment consistency.
+Both of these files can be found in the root of the source tree.
 
 .. _abstractly defined: Poetry-dependencies_
 .. _specifically pinned versions: Poetry-poetrylock_
 
-The following installs both installation and development dependencies as
-specified in the :file:`pyproject.toml` file, with versions specified
-(including for transitive depedencies) in the :file:`poetry.lock` file:
+The following command installs both installation and development dependencies
+as specified in the :file:`pyproject.toml` file, with versions specified
+(including for transitive dependencies) in the :file:`poetry.lock` file:
 
 .. prompt:: bash
 

@@ -85,6 +85,7 @@ class I3:
 
 
 class I4 (Pluggable):
+    """ Separate interface with __new__, base-classed on left. """
     def __new__(cls: Type[I4_T], *args: Any, **kwargs: Any) -> I4_T:
         assert args == (1, 2)
         assert kwargs == {}

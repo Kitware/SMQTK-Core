@@ -46,6 +46,7 @@ import pkg_resources
 import types
 from typing import cast, Any, Collection, FrozenSet, Set, Type, TypeVar
 
+
 # Environment variable *PATH separator for the current platform.
 OS_ENV_PATH_SEP = os.pathsep
 

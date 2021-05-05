@@ -1,5 +1,5 @@
-SMQTK-Core v0.17.0
-==================
+v0.17.0
+=======
 
 
 Updates / New Features

@@ -33,7 +33,7 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.6"
-setuptools = ">=53"
+importlib-metadata = {version = "^3.7", python = "<3.8"}
 
 [tool.poetry.dev-dependencies]
 # CI
@@ -51,6 +51,9 @@ livereload = "^2.6.3"
 coverage = "^5.5"
 pytest = "^6.2.2"
 pytest-cov = "^2.11.1"
+# Development
+ipython = "^7.16.1"
+jedi = "^0.17.2"
 
 ###############################################################################
 [tool.pytest.ini_options]
@@ -58,6 +61,8 @@ addopts = [
     "-lv",                  # Show local in trace-backs.
     "--doctest-modules",    # Increased verbosity.
     "--tb=long",            # Trace-back print mode.
+    "--cov=smqtk_core", # Cover our package specifically
+    "--cov-report=term",    # Coverage report to terminal
 ]
 testpaths = [
     "tests",

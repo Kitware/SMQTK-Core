@@ -59,7 +59,7 @@ else:
     import importlib_metadata as metadata
 
     def get_ns_entrypoints(ns: str) -> Iterable["metadata.EntryPoint"]:
-        return metadata.entry_points(group=ns)
+        return metadata.entry_points(group=ns)  # lgtm [py/call/wrong-named-argument]
 
 
 # Environment variable *PATH separator for the current platform.

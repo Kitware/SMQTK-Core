@@ -1,5 +1,12 @@
-Pending Release Notes
-=====================
+v0.18.0
+=======
+This minor update removes the runtime requirement on the ``setuptools`` package
+in favor of equivalent functionality that is in the standard library from
+python version 3.8 and onward.
+For python versions 3.7 and lower, we introduce the common
+``importlib-metadata`` backport package.
+
+Additional updates may be found below.
 
 
 Updates / New Features

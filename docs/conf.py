@@ -15,7 +15,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.absolute()))
 
 # Helper imports from repo root
-import smqtk_core
+from smqtk_core.plugin import metadata
 
 # -- Project information -----------------------------------------------------
 
@@ -24,7 +24,7 @@ copyright = '2015, Kitware, Inc.'
 author = 'Kitware, Inc.'
 
 # The full version, including alpha/beta/rc tags
-release = smqtk_core.__version__
+release = metadata.version("smqtk-core")
 
 
 # -- General configuration ---------------------------------------------------

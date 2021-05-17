@@ -42,9 +42,24 @@ import importlib
 import inspect
 import logging
 import os
-import pkg_resources
+import sys
 import types
-from typing import cast, Any, Collection, FrozenSet, Set, Type, TypeVar
+from typing import cast, Any, Collection, FrozenSet, Iterable, Set, Type, TypeVar
+
+# Before 3.8, we depend on importlib_metadata >=3.7.0, which is in parity with
+# the python version 3.10+ `importlib.metadata.entry_points`.
+# This comparison IS NOT CHAINED on purpose to support mypy compatibility.
+# noinspection PyChainedComparisons
+if sys.version_info >= (3, 8) and sys.version_info < (3, 10):
+    import importlib.metadata as metadata
+
+    def get_ns_entrypoints(ns: str) -> Iterable["metadata.EntryPoint"]:
+        return metadata.entry_points().get(ns, ())
+else:
+    import importlib_metadata as metadata
+
+    def get_ns_entrypoints(ns: str) -> Iterable["metadata.EntryPoint"]:
+        return metadata.entry_points(group=ns)  # lgtm [py/call/wrong-named-argument]
 
 
 # Environment variable *PATH separator for the current platform.
@@ -250,19 +265,13 @@ def discover_via_entrypoint_extensions(entrypoint_ns: str) -> Set[Type]:
         in the extensions under the specified entry-point.
     """
     type_set: Set[Type] = set()
-    for entry_point in pkg_resources.iter_entry_points(
-        entrypoint_ns
-    ):  # type: pkg_resources.EntryPoint
+    for entry_point in get_ns_entrypoints(entrypoint_ns):
         m = entry_point.load()
         if not isinstance(m, types.ModuleType):
-            ep_dist = entry_point.dist
-            ep_dist_key = getattr(ep_dist, "key", "UNKNOWN-PACKAGE")
-            ep_dist_ver = getattr(ep_dist, "version", "UNKNOWN-VERSION")
             raise NotAModuleError(
-                f"Extension provided by the package '{ep_dist_key} "
-                f"(version: {ep_dist_ver})' did NOT resolve to a python "
-                f"module (got an object of type {type(m).__name__} instead: "
-                f"{m})."
+                f"An entrypoint with key '{entry_point.name}' and value "
+                f"'{entry_point.value}' did not specify a module (got an "
+                f"object of type `{type(m).__name__}` instead): {m}"
             )
         else:
             type_set.update(_collect_types_in_module(m))

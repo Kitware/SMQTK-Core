@@ -12,7 +12,6 @@ While the two mixin classes function independently and can be utilized on their
 own, they have been designed such that their combination is symbiotic.
 
 .. __: https://en.wikipedia.org/wiki/Abstract_type
-
 .. _P&C-PluggableMixin:
 
 The :class:`~smqtk_core.plugin.Pluggable` Mixin
@@ -183,21 +182,22 @@ definition of an "implementation" (see
 
    # File: MyPackage/implementation.py
    from MyPackage.interface import MyInterface
-   from typing import Dict
+   from typing import Any, Dict
 
    class MyImplementation(MyInterface):
 
-       def __init__(self, paramA: int = 1, paramB: int = 2) -> None:
+       def __init__(self, paramA: int = 1, paramB: int = 2):
            """Implementation constructor."""
-           ...
+           self.a = paramA
+           self.b = paramB
 
        # Abstract method from the Configurable mixin.
-       def get_config(self) -> Dict:
+       def get_config(self) -> Dict[str, Any]:
            # As per Configurable documentation, this should return the same
            # non-self keys as the constructor.
            return {
-               "paramA": ...,
-               "paramB": ...,
+               "paramA": self.a,
+               "paramB": self.b,
            }
 
        # Abstract method from MyInterface
@@ -263,9 +263,291 @@ OK!
 In such cases, additional methods would need to be overridden as defined in the
 :mod:`smqtk_core.configuration` module.
 
+Supporting configuration with more complicated constructors
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+In the above example, only very simple, already-JSON-compliant data types were
+utilized in the constructor.
+This not intended to imply that there is a restriction in constructor
+specification.
+Instead, the :class:`.Configurable` mixin provides overridable methods to
+insert conversion to and from JSON-compliant dictionaries, to provide a class
+"default" configuration as well as for factory-generation of a class instance
+from an input configuration.
 
-Reference
-^^^^^^^^^
+Instead of the above implementation, let us consider a slightly more complex
+implementation of ``MyInterface`` defined above.
+In this new implementation we show the implementation of two additional class
+methods from the :class:`.Configurable` mixin:
+:meth:`.Configurable.get_default_config` and  :meth:`.Configurable.from_config`.
+These allow us to customize the how we maintain JSON-compliance.
+
+.. code-block:: python
+
+    from MyPackage.interface import MyInterface
+    from typing import Any, Dict, Type, TypeVar
+    from datetime import datetime
+
+
+    C = TypeVar("C", bound="DateContainer")
+
+
+    class DateContainer (MyInterface):
+        """
+        This example implementation takes in datetime instances as constructor
+        parameters, one of which has a default.
+        Both parameters in this example require a `datetime` instance value at
+        construction time, but since `b_date` has a default value, it is not
+        strictly required that an input configuration provide a value for the
+        `b_date` parameter since there is a default to draw upon.
+        """
+
+        def __init__(
+            self,
+            a_date: datetime,
+            b_date: datetime = datetime.utcfromtimestamp(0),
+        ):
+            self.a_date = a_date
+            self.b_date = b_date
+
+        # NEW FROM PREVIOUS EXAMPLE
+        # Abstract method from the Configurable mixin.
+        @classmethod
+        def get_default_config(cls) -> Dict[str, Any]:
+            # Utilize the mixin-class implementation to introspect our
+            # constructor and make a parameter-to-value dictionary.
+            cfg = super().get_default_config()
+            # We are ourself, so we know that cfg['a_date'] has a default value
+            # and it will be a datetime instance.
+            cfg['b_date'] = datetime_to_str(cfg['b_date'])
+            # We know that `a_date` is not given a default, so its "default"
+            # value of None, which is JSON-compliant, is left alone.
+            return cfg
+
+        # NEW FROM PREVIOUS EXAMPLE
+        # Abstract method from the Configurable mixin.
+        @classmethod
+        def from_config(
+            cls: Type[C],
+            config_dict: Dict,
+            merge_default: bool = True
+        ) -> C:
+            # Following the example found in the Configurable.from_config
+            # doc-string.
+            config_dict = dict(config_dict)
+            # Convert required input data into the constructor-expected types.
+            # This implementation will expectedly error if the expected input
+            # is missing.
+            config_dict['a_date'] = str_to_datetime(config_dict['a_date'])
+            # b_date might not be there because there's a default that can fill
+            # in.
+            b_date = config_dict.get('b_date', None)
+            if b_date is not None:
+              config_dict['b_date'] = str_to_datetime(b_date)
+            return super().from_config(config_dict, merge_default=merge_default)
+
+        # Abstract method from the Configurable mixin.
+        def get_config(self) -> Dict[str, Any]:
+            # This now matches the same complex-to-JSON conversion as the
+            # `get_default_config`. We show the use of a helper function to
+            # reduce code duplication.
+            return {
+                "a_date": datetime_to_str(self.date),
+            }
+
+        # Abstract method from MyInterface
+        def my_behavior(self, x: str) -> int:
+            """My fancy implementation."""
+            ...
+
+
+    def datetime_to_str(dt: datetime) -> str:
+        """ Local helper function for config conversion from datetime. """
+        # This conversion may be arbitrary to the level of detail that this
+        # local implementation considers important. We choose to use strings
+        # here as an example, but there's nothing special that requires that
+        # other than JSON type compliance.
+        return str(dt)
+
+
+    def str_to_datetime(s: str) -> datetime:
+        """ Local helper function for config conversion into datetime """
+        # Reverse of above converter.
+        if '.' in s:  # has decimal seconds
+            return datetime.strptime(s, "%Y-%m-%d %H:%M:%S.%f")
+        return datetime.strptime(s, "%Y-%m-%d %H:%M:%S")
+
+
+The above then allows us to create instances of this instance with the JSON
+config:
+
+.. code-block:: python
+
+    >>> inst = DateContainer.from_config({
+    ...   "a_date": "2021-01-01 00:00:00.123123"
+    ...   "b_date": "1970-01-01 00:00:01",
+    ... })
+    >>> str(inst.a_date)
+    '2021-01-01 00:00:00.123123'
+    >>> str(inst.b_date)
+    '1970-01-01 00:00:01'
+
+Or even just:
+
+.. code-block:: python
+
+    >>> inst = DateContainer.from_config({
+    ...   "a_date": "2021-01-01 00:00:00.123123"
+    ... })
+    >>> str(inst.a_date)
+    '2021-01-01 00:00:00.123123'
+    >>> str(inst.b_date)
+    '1970-01-01 00:00:00'
+
+While such inline usage is less likely to be called so directly as opposed to
+just calling the constructor, this form is useful when constructing directly
+from a deserialized configuration:
+
+.. code-block:: python
+
+    >>> # Maybe received this from a web request!
+    >>> from_file = '{"a_date": "2021-01-01 00:00:00.123123", "b_date": "1970-01-01 00:00:01"}'=
+    >>> import json
+    >>> inst = DateContainer.from_config(json.loads(from_file))
+    >>> str(inst.a_date)
+    '2021-01-01 00:00:00.123123'
+    >>> str(inst.b_date)
+    '1970-01-01 00:00:01'
+
+Instances may also be "cloned" by creating a new instance from the current
+configuration output from another instance using the
+:meth:`.Configurable.get_config` instance method:
+
+.. code-block:: python
+
+    >>> # assume and `inst` from above
+    >>> inst2 = DataContainer.from_config(inst.get_config())
+    >>> assert inst.a_date == inst2.a_date
+    >>> assert inst.b_date == inst2.b_date
+
+This is again a little silly in the demonstration context because we know what
+instance type and attributes are to construct a second one, however if the
+concrete instance is not known at runtime, this may be an alternate means of
+constructing a duplicate instance (at least "duplicate" in regards to
+construction).
+
+
+Multiple Implementation Choices
+"""""""""""""""""""""""""""""""
+One usage mode of :mod:`smqtk_core.configuration` configuration is when a
+configuration slot may be comprised of one of multiple
+:class:`.Configurable`-implementing choices.
+Also found in the :mod:`smqtk_core.configuration` module are additional helper
+functions for navigating this use-case:
+  * :func:`.make_default_config`
+  * :func:`.to_config_dict`
+  * :func:`.from_config_dict`
+
+These methods utilize JSON-compliant dictionaries to represent configurations
+that follow the schema::
+
+    {
+        "type": "object",
+        "properties": {
+            "type": {"type": "string"},
+        },
+        "additionalProperties": {"type": "object"},
+    }
+
+Getting Defaults from a group of types
+''''''''''''''''''''''''''''''''''''''
+When programmatically creating a multiple-choice configuration
+structure for output, the :func:`.make_default_config` function may be
+convenient to use.
+This takes in some :class:`~typing.Iterable` of
+:class:`.Configurable`-inheriting types and returns a JSON-compliant
+dictionary.
+This may be useful, for example, when a higher-order tool wants to
+programmatically generate a default configuration for itself for serialization
+or for some other interface.
+
+This function may be called with an independently generated :class:`.Iterable`
+of inputs, however this also melds well with the:meth:`.Pluggable.get_impls`
+class method.
+For example, let us use the pluggable :class:`MyInterface` class defined above:
+
+.. code-block:: python
+
+    >>> from smqtk_core.configuration import make_default_config
+    >>> cfg_dict = make_default_config(MyInterface.get_impls())
+    >>> cfg_dict
+    {
+        "type": None,
+        "__main__.MyImplementation": {
+            "paramA": 1,
+            "paramB": 2
+        },
+        "__main__.DateContainer": {
+            "a_date": None,
+            "b_date": "1970-01-01 00:00:00"
+        }
+    }
+
+See the method documentation for additional details.
+
+Factory constructing from configuration
+'''''''''''''''''''''''''''''''''''''''
+The opposite of above, the :func:`.from_config_dict` will take a configuration
+multiple-choice dictionary structure and "hydrate" an instance of the
+configured type with the configured parameters (if it's available, of course).
+This function again takes an :class:`.Iterable` of
+:class:`.Configurable`-inheriting types which again melds well with the
+:class:`.Pluggable.get_impls` class method where applicable.
+
+For example, if we take the "default" configuration output above, change the
+``"type"`` value to refer to the "MyImplementation" type and pass it to this
+function, we get a fully constructed instance:
+
+.. code-block:: python
+
+    >>> from smqtk_core.configuration import from_config_dict
+    >>> # Let's modify the config away from default values.
+    >>> cfg_dict['__main__.MyImplementation'] = {'paramA': 77, 'paramB': 444}
+    >>> inst = from_config_dict(cfg_dict, MyInterface.get_impls())
+    >>> assert inst.a == 77
+    >>> assert inst.b == 444
+
+See the method documentation for additional details.
+
+Help with writing unit tests for Configurable-implementing types
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+When creating new implementations of things that includes
+:class:`.Configurable` functionality it is often good to include tests that
+make sure the expected configuration capabilities operate as they should.
+We include a helper function to lower the cost of adding such a test:
+:func:`.configuration_test_helper`.
+This will exercise certain runtime-assumptions that are not strictly required
+to define and construct :class:`.Configurable`-inheriting types.
+
+For an example, let's assume we are writing a unit test for the above-defined
+:class:`.MyImplementation` class:
+
+.. code-block:: python
+
+    >>> from smqtk_core.configuration import configuration_test_helper
+    >>>
+    >>> class TestMyImplementation:
+    ...     def test_config(self):
+    ...         inst = MyImplementation(paramA=77, paramB=444)
+    ...         for i in configuration_test_helper(inst):
+    ...             # Checking that yielded instance properties are as expected
+    ...             assert i.a == 77
+    ...             assert i.b == 444
+
+See the method documentation for additional details.
+
+
+Module References
+^^^^^^^^^^^^^^^^^
 
 :mod:`smqtk_core`
 """""""""""""""""

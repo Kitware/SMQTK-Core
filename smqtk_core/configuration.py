@@ -170,7 +170,7 @@ class Configurable (metaclass=abc.ABCMeta):
 
                @classmethod
                def from_config(
-                   cls: Type(D),
+                   cls: Type[D],
                    config_dict: Dict,
                    merge_default: bool = True
                ) -> D:
@@ -224,11 +224,15 @@ class Configurable (metaclass=abc.ABCMeta):
         if merge_default:
             config_dict = merge_dict(cls.get_default_config(), config_dict)
 
-        # Warnings about this applying to the *current* class, Configurable, of
-        # course are valid, but this is intended to apply dynamically to a
-        # subclass invoking this method: one which *does* implement a
-        # constructor.
-        # noinspection PyArgumentList
+        # A `type: ignore` is applied here as there is an error emitted due to
+        # this abstract class not locally defining a constructor that takes
+        # arguments. While locally valid, this is an abstract class that
+        # sensibly does not define a constructor. This construction is intended
+        # to apply dynamically to the sub-class that is being instantiated from
+        # the input configuration dictionary. It is also technically valid for
+        # keyword variadic expansion to be empty and be expanded into a
+        # constructor that takes no parameters. Due to the reasons above, we
+        # `type: ignore` this line.
         return cls(**config_dict)  # type: ignore
 
     @abc.abstractmethod
@@ -282,13 +286,21 @@ def make_default_config(configurable_iter: Iterable[Type[C]]) -> Dict[str, Union
     to this function.  While functionally acceptable, it is generally not
     recommended to draw configurations from abstract classes.
 
+    The ``"type"`` returned is ``None`` because we explicitly do not make any
+    decisions about an appropriate default type.
+    Additionally, this value stays ``None`` even when there is just one choice
+    as we do not assume that is a valid choice as well as do not assume that
+    the default configuration for that choice is valid for construction.
+    This serves to cause the user to explicitly check that the multiple-choice
+    configuration is set to point to a choice as well as that the choice is
+    properly configured.
+
     :param configurable_iter:
         An iterable of class types class types that sub-class ``Configurable``.
 
     :return: Base configuration dictionary with an empty ``type`` field, and
         containing the types and initialization parameter specification for all
         implementation types available from the provided getter method.
-
     """
     d: Dict[str, Union[None, str, Dict]] = {"type": None}
     for cls in configurable_iter:
@@ -343,6 +355,7 @@ def to_config_dict(c_inst: Configurable) -> Dict:
     format (see above module documentation).
 
     For example, with a simple Configurable derived class:
+
     >>> class SimpleConfig(Configurable):
     ...     def __init__(self, a=1, b='foo'):
     ...         self.a = a

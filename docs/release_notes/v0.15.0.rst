@@ -1,0 +1,5 @@
+v0.15.0
+=======
+
+This is the initial release of ``smqtk-core``, spinning off from v0.14.0 of the
+monolithic ``smqtk`` library.

@@ -1,0 +1,22 @@
+name: "python-env-setup"
+description: "Setup user python environment with poetry and enable caching."
+runs:
+  using: "composite"
+  steps:
+    - name: Install Poetry
+      run: |
+        echo "${HOME}/.local/bin" >> $GITHUB_PATH
+        pip install --user -U poetry
+      shell: bash
+    - name: Versions of things used here
+      run: |
+        command -v python
+        python --version
+        command -v pip
+        pip --version
+        command -v poetry
+        poetry -V
+      shell: bash
+    - name: Setup venv
+      run: poetry install
+      shell: bash

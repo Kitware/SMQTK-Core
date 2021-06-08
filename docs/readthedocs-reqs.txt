@@ -1,13 +1,3 @@
-# Base SMQTK requirements: ReadTheDocs installs the package.
--r ../requirements.txt
-
-# Some of these deps are installed by ReadTheDocs implicitly so they are
-# "duplicate" here. However, listing them here is useful for a local
-# documentation build. Not pinning versions to allow specifically pinned
-# versions by ReadTheDocs to not be modified.
-sphinx
-sphinx_rtd_theme
-
-# SMQTK specific documentation depedencies
+# Additional requirements for building our documentation in read-
 sphinx-argparse==0.2.5
-sphinx-prompt==1.3.0
+sphinx-prompt==1.4.0

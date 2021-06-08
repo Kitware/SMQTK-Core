@@ -1,15 +1,15 @@
 """Unit tests for the plugin utility sub-module."""
 import abc
 import os
-import pkg_resources
 import types
-from typing import cast
+from typing import cast, Any, Type, TypeVar
 from unittest import mock
 
 import pytest
 
 # noinspection PyProtectedMember
 from smqtk_core.plugin import (
+    metadata,
     OS_ENV_PATH_SEP,
     is_valid_plugin,
     _collect_types_in_module,
@@ -40,16 +40,57 @@ TYPES_IN_MORE_STUFF_MODULE = {
     type,
 }
 
-# Empty constructed "distribution" for testing extensions. Basically want it's
-# "requirement-less" reporting.
-EMPTY_DIST = pkg_resources.Distribution(
-    project_name="tests", version="test"
-)
+# Classes for testing multiple inheritance situations.
+# Having them up here instead of in test classes for successful type annotation
+# for typechecking.
+I2_T = TypeVar("I2_T", bound="I2")
+I3_T = TypeVar("I3_T", bound="I3")
+I4_T = TypeVar("I4_T", bound="I4")
+
+
+class I1:
+    """ Separate simple interface. """
+    def __init__(self, a: int, b: int):
+        self.x = (a, b)
+
+
+class I2:
+    """ Separate interface with __new__, base-classed on left. """
+    def __new__(cls: Type[I2_T], *args: Any, **kwargs: Any) -> I2_T:
+        assert args == (1, 2)
+        assert kwargs == {}
+        # Local parent is object, so nothing to pass on.
+        return super().__new__(cls)
+
+    def __init__(self, a: int, b: int):
+        self.x = (a, b)
+
+
+class I3:
+    """ Separate interface with __new__, base-classed on right. """
+    def __new__(cls: Type[I3_T], *args: Any, **kwargs: Any) -> I3_T:
+        assert args == ()
+        assert kwargs == {}
+        # Local parent is object, so nothing to pass on.
+        return super().__new__(cls)
+
+    def __init__(self, a: int, b: int):
+        self.x = (a, b)
+
+
+class I4 (Pluggable):
+    """ Separate interface with __new__, base-classed on left. """
+    def __new__(cls: Type[I4_T], *args: Any, **kwargs: Any) -> I4_T:
+        assert args == (1, 2)
+        assert kwargs == {}
+        return super().__new__(cls)
+
+    def __init__(self, a: int, b: int):
+        self.x = (a, b)
 
 
 ###############################################################################
 # Tests
-
 
 class TestIsValidPlugin:
     def test_not_different_type(self) -> None:
@@ -234,77 +275,91 @@ class TestDiscoveryViaEntrypointExtensions:
     Unit tests for entry-point extension based discovery of types.
     """
 
-    @mock.patch("smqtk_core.plugin.pkg_resources.iter_entry_points")
-    def test_no_extensions_for_entrypoint(self, m_iter_ep: mock.Mock) -> None:
+    @mock.patch("smqtk_core.plugin.get_ns_entrypoints")
+    def test_no_extensions_for_entrypoint(self, m_get_ep: mock.Mock) -> None:
         """
         Test that no types are returned when there are no extensions for the
         given test entry-point namespace.
         """
         # Mock an empty number of entrypoint returns.
-        m_iter_ep.return_value = []
+        m_get_ep.return_value = ()
         type_set = discover_via_entrypoint_extensions('my_namespace')
         assert len(type_set) == 0
 
-    @mock.patch("smqtk_core.plugin.pkg_resources.iter_entry_points")
-    def test_valid_extension_for_ns(self, m_iter_ep: mock.Mock) -> None:
+    @mock.patch("smqtk_core.plugin.get_ns_entrypoints")
+    def test_valid_extension_for_ns(self, get_ep: mock.Mock) -> None:
         """
         Test that a module's types are successfully returned when there is an
         EntryPoint referring to that module (NOT attribute).
         """
-        m_iter_ep.return_value = [
-            pkg_resources.EntryPoint.parse(
-                "module_via_extension_one = tests.test_plugin_dir.module_of_stuff",
-                dist=EMPTY_DIST
+        my_namespace = "my_namespace"
+        get_ep.return_value = (
+            metadata.EntryPoint(
+                name="module_via_extension_one",
+                value="tests.test_plugin_dir.module_of_stuff",
+                group=my_namespace,
             ),
-            pkg_resources.EntryPoint.parse(
-                "module_via_extension_two = tests.test_plugin_dir.module_of_more_stuff",
-                dist=EMPTY_DIST
+            metadata.EntryPoint(
+                name="module_via_extension_two",
+                value="tests.test_plugin_dir.module_of_more_stuff",
+                group=my_namespace
             ),
-        ]
-        type_set = discover_via_entrypoint_extensions("my_namespace")
+        )
+        type_set = discover_via_entrypoint_extensions(my_namespace)
+        get_ep.assert_called_once_with(my_namespace)
         assert type_set == (TYPES_IN_STUFF_MODULE | TYPES_IN_MORE_STUFF_MODULE)
 
-    @mock.patch("smqtk_core.plugin.pkg_resources.iter_entry_points")
-    def test_invalid_ep_warning(self, m_iter_ep: mock.Mock) -> None:
+    @mock.patch("smqtk_core.plugin.get_ns_entrypoints")
+    def test_invalid_ep_warning(self, m_get_ep: mock.Mock) -> None:
         """
         Test that a warning is emitted when an entry-point is specified but is
         NOT a module.
         """
-        m_iter_ep.return_value = [
-            # An attribute specification that should be skipped.
-            pkg_resources.EntryPoint.parse(
-                "module_via_extension_bad "
-                "= tests.test_plugin_dir.module_of_more_stuff:argparse.ArgumentParser",
-                dist=EMPTY_DIST
-            ),
-        ]
+        my_namespace = "my_namespace"
+        # An entrypoint referring to an attribute specification. This should
+        # cause this EP to be skipped.
+        test_ep = metadata.EntryPoint(
+            name="module_via_extension_bad",
+            value="tests.test_plugin_dir.module_of_more_stuff:argparse.ArgumentParser",
+            group=my_namespace,
+        )
+        # Mock the entrypoints getter to return our test scenario, assuming
+        # it is called with a group selector (turning iterable).
+        m_get_ep.return_value = (test_ep,)
+
         with pytest.raises(
             NotAModuleError,
-            match=r"Extension provided by the package 'tests \(version: test\)' "
-                  r"did NOT resolve to a python module"
+            match=r"An entrypoint with key 'module_via_extension_bad' and "
+                  r"value 'tests.test_plugin_dir.module_of_more_stuff:"
+                  r"argparse.ArgumentParser' did not specify a module "
+                  r"\(got an object of type `type` instead\): "
         ):
             discover_via_entrypoint_extensions("my_namespace")
 
-    @mock.patch("smqtk_core.plugin.pkg_resources.iter_entry_points")
-    def test_module_with_error(self, m_iter_ep: mock.Mock) -> None:
+    @mock.patch("smqtk_core.plugin.get_ns_entrypoints")
+    def test_module_with_error(self, m_get_ep: mock.Mock) -> None:
         """
         Test when there is an entry-point specifying a module with an error.
         """
-        m_iter_ep.return_value = [
-            pkg_resources.EntryPoint.parse(
-                "module_via_extension_one = tests.test_plugin_dir.module_of_stuff",
-                dist=EMPTY_DIST
+        my_namespace = "my_namespace"
+        m_get_ep.return_value = (
+            metadata.EntryPoint(
+                name="module_via_extension_one",
+                value="tests.test_plugin_dir.module_of_stuff",
+                group=my_namespace,
             ),
-            pkg_resources.EntryPoint.parse(
-                "module_via_extension_two = tests.test_plugin_dir.module_of_more_stuff",
-                dist=EMPTY_DIST
+            metadata.EntryPoint(
+                name="module_via_extension_two",
+                value="tests.test_plugin_dir.module_of_more_stuff",
+                group=my_namespace,
             ),
             # Error causing entrypoint
-            pkg_resources.EntryPoint.parse(
-                "module_via_extension_two = tests.test_plugin_dir.module_with_exception",
-                dist=EMPTY_DIST
+            metadata.EntryPoint(
+                name="module_via_extension_two",
+                value="tests.test_plugin_dir.module_with_exception",
+                group=my_namespace,
             ),
-        ]
+        )
         with pytest.raises(RuntimeError, match=r"^Expected error on import$"):
             discover_via_entrypoint_extensions("my_namespace")
 
@@ -474,3 +529,94 @@ class TestPluggable:
             match=r"Implementation class '\w+' is not currently usable\."
         ):
             NotUsable()
+
+    def test_multiple_inheritance_alone_right(self) -> None:
+        """
+        Test that when Pluggable is used in multiple inheritance with another
+        class that *does not* implement __new__, and is to the right of the
+        other type, the derivative type successfully constructs.
+        """
+        class D (I1, Pluggable):
+            def __new__(cls, *args: Any, **kwargs: Any) -> "D":
+                assert args == (1, 2)
+                assert kwargs == {}
+                return super().__new__(cls, *args, **kwargs)
+
+            def foo(self) -> int:
+                return sum(self.x)
+
+        assert D(1, 2).foo() == 3
+
+    def test_multiple_inheritance_alone_left(self) -> None:
+        """
+        Test that when Pluggable is used in multiple inheritance with another
+        class that *does not* implement __new__, and is to the left of the
+        other type, the derivative type successfully constructs.
+        """
+        class D (Pluggable, I1):
+            def __new__(cls, *args: Any, **kwargs: Any) -> "D":
+                assert args == (1, 2)
+                assert kwargs == {}
+                return super().__new__(cls, *args, **kwargs)
+
+            def foo(self) -> int:
+                return sum(self.x)
+
+        assert D(1, 2).foo() == 3
+
+    def test_multiple_inheritance_dual_right(self) -> None:
+        """
+        Test that when Pluggable is used in multiple inheritance with another
+        class that implements __new__, and is to the right of the other type,
+        the derivative type successfully constructs.
+        """
+        # Unsure why flake8 has trouble with this?
+        class D(I2, Pluggable):
+            def __new__(cls: Type["D"], *args: Any, **kwargs: Any) -> "D":  # noqa: F821
+                assert args == (1, 2)
+                assert kwargs == {}
+                return super().__new__(cls, *args, **kwargs)
+
+            def foo(self) -> int:
+                return sum(self.x)
+
+        assert D(1, 2).foo() == 3
+
+    def test_multiple_inheritance_dual_left(self) -> None:
+        """
+        Test that when Pluggable is used in multiple inheritance with another
+        class that implements a parameter-less __new__, and is to the left of
+        the other type, the other type's __new__ receives no arguments and the
+        derivative type successfully constructs.
+        """
+        # Unsure why flake8 has trouble with this?
+        class D (Pluggable, I3):
+            def __new__(cls: Type["D"], *args: Any, **kwargs: Any) -> "D":  # noqa: F821
+                assert args == (1, 2)
+                assert kwargs == {}
+                return super().__new__(cls, *args, **kwargs)
+
+            def foo(self) -> int:
+                return sum(self.x)
+
+        assert D(1, 2).foo() == 3
+
+    def test_multiple_inheritance_chain_success(self) -> None:
+        """
+        Test that when Pluggable is used in multiple inheritance with another
+        type that also inherits from pluggable, when a derivative class
+        incorrectly positions it's base classes, an appropriate TypeError is
+        raised (part of python, not our functionality).
+        """
+        # Switched base-class list is not even constructable (also throws
+        # type-check error in such a condition).
+        class D (I4, Pluggable):
+            def __new__(cls: Type["D"], *args: Any, **kwargs: Any) -> "D":  # noqa: F821
+                assert args == (1, 2)
+                assert kwargs == {}
+                return super().__new__(cls, *args, **kwargs)
+
+            def foo(self) -> int:
+                return sum(self.x)
+
+        assert D(1, 2).foo() == 3

@@ -3,7 +3,6 @@
 # This file only contains a selection of the most common options. For a full
 # list see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
-import os
 import sys
 from pathlib import Path
 
@@ -16,7 +15,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.absolute()))
 
 # Helper imports from repo root
-from setup import VERSION
+from smqtk_core.plugin import metadata
 
 # -- Project information -----------------------------------------------------
 
@@ -25,7 +24,7 @@ copyright = '2015, Kitware, Inc.'
 author = 'Kitware, Inc.'
 
 # The full version, including alpha/beta/rc tags
-release = VERSION
+release = metadata.version("smqtk-core")
 
 
 # -- General configuration ---------------------------------------------------

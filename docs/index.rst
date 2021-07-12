@@ -45,6 +45,7 @@ synergistically.
    installation
    plugins_configuration
    releasing
+   faq
 
 
 Indices and tables

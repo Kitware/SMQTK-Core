@@ -46,6 +46,7 @@ synergistically.
    plugins_configuration
    review_process
    releasing
+   faq
 
 
 Indices and tables

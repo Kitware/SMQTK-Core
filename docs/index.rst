@@ -44,6 +44,7 @@ synergistically.
 
    installation
    plugins_configuration
+   review_process
    releasing
 
 

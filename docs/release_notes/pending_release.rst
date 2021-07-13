@@ -11,6 +11,9 @@ Documentation
   module: non-trivial constructor type configuration, and multiple-choice
   configuration specification, generation and utilization.
 
+* Added a review process document that details how SMQTK PR's should be
+  reviewed.
+
 
 Fixes
 -----

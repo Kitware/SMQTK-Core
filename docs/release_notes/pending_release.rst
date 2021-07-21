@@ -19,3 +19,7 @@ Documentation
 
 Fixes
 -----
+
+Documentation
+
+* Fix some white-space and indentation issues in the ``README.md`` file.

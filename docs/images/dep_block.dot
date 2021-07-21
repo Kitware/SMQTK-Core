@@ -1,0 +1,74 @@
+digraph dependencies {
+
+graph [
+    rankdir=BT,     // Direct from the bottom to the top.
+    splines=ortho,  // Use straight/elbow lines.
+    nodesep=0,
+    ranksep=0.33,
+];
+node [
+    shape=box,
+    style=filled,
+];
+
+core [
+    label="SMQTK-Core",
+    width=8,
+    URL="https://github.com/Kitware/SMQTK-Core"
+];
+dataprovider [
+    label="SMQTK-Dataprovider",
+    width=8,
+    URL="https://github.com/Kitware/SMQTK-Dataprovider",
+];
+imageio [
+    label="SMQTK-Image-IO",
+    width=4,
+    URL="https://github.com/Kitware/SMQTK-Image-IO",
+];
+descriptors [
+    label="SMQTK-Descriptors",
+    width=4,
+    URL="https://github.com/Kitware/SMQTK-Descriptors",
+];
+classifier [
+    label="SMQTK-Classifier",
+    width=2,
+    URL="https://github.com/Kitware/SMQTK-Classifier",
+];
+indexing [
+    label="SMQTK-Indexing",
+    width=2,
+    URL="https://github.com/Kitware/SMQTK-Indexing",
+];
+relevancy [
+    label="SMQTK-Relevancy",
+    width=4,
+    URL="https://github.com/Kitware/SMQTK-Relevancy",
+];
+
+{rank=same; core;}
+{rank=same; dataprovider;}
+{rank=same; descriptors imageio;}
+{rank=same; classifier indexing;}
+{rank=same; relevancy;}
+
+dataprovider -> core;
+imageio -> dataprovider;
+descriptors -> dataprovider;
+indexing -> descriptors;
+classifier -> descriptors;
+relevancy -> classifier;
+relevancy -> indexing;
+
+}
+
+// inotifywait -e close_write -m . |
+//   while read -r directory events filename
+//   do
+//     if [[ "$filename" = "dep_block.dot" ]]
+//     then
+//       echo "Regenerating dep_block.svg"
+//       dot dep_block.dot -Tsvg -o dep_block.svg
+//     fi
+//   done;

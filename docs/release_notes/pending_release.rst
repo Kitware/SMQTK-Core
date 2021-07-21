@@ -16,6 +16,8 @@ Documentation
 * Added a review process document that details how SMQTK PR's should be
   reviewed.
 
+* Update the "Libraries" section of the ``README.md`` file for more detail.
+
 
 Fixes
 -----

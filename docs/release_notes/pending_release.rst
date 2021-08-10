@@ -8,7 +8,8 @@ Updates / New Features
 CI
 
 * Added use of CodeCov. Fixed/added unittests to show 100% of test code,
-  e.g. no dead-code in the tests.
+  e.g. no dead-code in the tests. CodeCov checks different coverage bars
+  for test and package scopes.
 
 Documentation
 

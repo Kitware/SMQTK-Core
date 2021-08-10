@@ -120,11 +120,11 @@ jobs:
         uses: ./.github/actions/python-poetry-setup
 
       - name: Run Unittests
-        run: poetry run pytest --cov=smqtk_core --cov-config=.pytest.coveragerc
+        run: poetry run pytest
 
       - name: CodeCov report submission
         uses: codecov/codecov-action@v1
         with:
           fail_ci_if_error: true
-          fails: coverage.xml
+          files: coverage.xml
           flags: unittests

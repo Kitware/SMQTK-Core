@@ -5,6 +5,11 @@ Pending Release Notes
 Updates / New Features
 ----------------------
 
+CI
+
+* Added use of CodeCov. Fixed/added unittests to show 100% of test code,
+  e.g. no dead-code in the tests.
+
 Documentation
 
 * Added an FAQ to cover some basic questions about SMQTK as a whole.

@@ -136,15 +136,13 @@ class TestIsValidPlugin:
         # noinspection PyAbstractClass
         class ImplementsMethodOnly(InterfaceType):
             # Lingering abstract property
-            def abs_method(self) -> None:
-                pass
+            def abs_method(self) -> None: ...
 
         # noinspection PyAbstractClass
         class ImplementsPropOnly(InterfaceType):
             # Lingering abstract method
             @property
-            def abs_prop(self) -> int:
-                return 0
+            def abs_prop(self) -> int: ...
 
         assert not is_valid_plugin(ImplementsMethodOnly, InterfaceType)
         assert not is_valid_plugin(ImplementsPropOnly, InterfaceType)
@@ -180,13 +178,11 @@ class TestIsValidPlugin:
 
         class InterfaceType(metaclass=abc.ABCMeta):
             @abc.abstractmethod
-            def feature(self) -> int:
-                ...
+            def feature(self) -> int: ...
 
         class ImplementingType(InterfaceType):
             # is_usable default is True
-            def feature(self) -> int:
-                return 0
+            def feature(self) -> int: ...
 
         assert is_valid_plugin(ImplementingType, InterfaceType)
 
@@ -211,11 +207,12 @@ class TestDiscoveryViaEnvVar:
         Test when variable of the given name is not set in the environment.
         Nothing should be returned from the discovery.
         """
-        # Delete the name in the env if it for some reason really existed...
+        # Clear any values in the environ for the test name in if it for some
+        #   reason really existed...
         # We're in a mock.patch.dict so it's OK to do this with out affecting
         #   parent scope.
-        if TestDiscoveryViaEnvVar.VAR_NAME in os.environ:
-            del os.environ[TestDiscoveryViaEnvVar.VAR_NAME]
+        os.environ[TestDiscoveryViaEnvVar.VAR_NAME] = ""
+
         type_set = discover_via_env_var(TestDiscoveryViaEnvVar.VAR_NAME)
         assert len(type_set) == 0
 
@@ -386,8 +383,7 @@ class TestDiscoverViaSubclasses:
         # Hypothetical parent class. Should not be included.
         class ParentClass(abc.ABC):
             @abc.abstractmethod
-            def some_method(self) -> None:
-                ...
+            def some_method(self) -> None: ...
 
         # Test finding descendents of this.
         # noinspection PyAbstractClass

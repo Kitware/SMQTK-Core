@@ -89,7 +89,8 @@ def test_configurable_default_config() -> None:
     class T (Configurable):
         # noinspection PyUnusedLocal
         def __init__(self, a: Any, b: Any, cat: Any):
-            pass
+            """ empty constructor """
+
     assert T.get_default_config() == {'a': None, 'b': None, 'cat': None}
 
 
@@ -103,7 +104,8 @@ def test_configurable_default_config_kwonlys() -> None:
     class T (Configurable):
         # noinspection PyUnusedLocal
         def __init__(self, a: Any, *, b: int = 0):
-            pass
+            """ empty constructor """
+
     assert T.get_default_config() == dict(a=None, b=0)
 
 
@@ -129,7 +131,8 @@ def test_configurable_default_config_with_star_args() -> None:
     class T (Configurable):
         # noinspection PyUnusedLocal
         def __init__(self, a: Any, b: Any, cat: Any, *args: Any, **kwargs: Any):
-            pass
+            """ empty constructor """
+
     assert T.get_default_config() == {'a': None, 'b': None, 'cat': None}
 
 
@@ -142,7 +145,8 @@ def test_configurable_default_config_with_default_values() -> None:
     class T (Configurable):
         # noinspection PyUnusedLocal
         def __init__(self, a: Any, b: Any, c: int = 0, d: str = 'foobar'):
-            pass
+            """ empty constructor """
+
     assert T.get_default_config() == \
         {'a': None, 'b': None, 'c': 0, 'd': 'foobar'}
 
@@ -158,7 +162,8 @@ def test_configurable_default_config_with_default_values_with_star_args() -> Non
         # noinspection PyUnusedLocal
         def __init__(self, a: Any, b: Any, c: int = 0, d: str = 'foobar',
                      *args: Any, **kwargs: Any):
-            pass
+            """ empty constructor """
+
     assert T.get_default_config() == \
         {'a': None, 'b': None, 'c': 0, 'd': 'foobar'}
 
@@ -227,6 +232,9 @@ def test_to_config_dict() -> None:
     Test that the second-level helper function is called appropriately and
     directly returns.
     """
+    # We will mock out the return of `cls_conf_to_config_dict` operation as
+    # that is tested elsewhere. We more want to make sure the input to this
+    # internal function is as expected.
     expected_ret_val = 'expected return value'
 
     with mock.patch('smqtk_core.configuration.cls_conf_to_config_dict') \
@@ -255,6 +263,23 @@ def test_to_config_dict() -> None:
         m_cctcd.assert_called_once_with(T1, i2_expected_conf)
         assert r2 == expected_ret_val
 
+    with mock.patch('smqtk_core.configuration.cls_conf_to_config_dict') \
+            as m_cctcd:
+        m_cctcd.return_value = expected_ret_val
+
+        i3 = T2(T1(foo=12, bar='OK'), 0.3, 'not default')
+        i3_expected_conf = {
+            'child': {
+                "foo": 12,
+                "bar": "OK",
+            },
+            "alpha": 0.3,
+            "beta": "not default",
+        }
+        r3 = to_config_dict(i3)
+        m_cctcd.assert_called_once_with(T2, i3_expected_conf)
+        assert r3 == expected_ret_val
+
 
 def test_to_config_dict_given_type() -> None:
     """
@@ -277,8 +302,8 @@ def test_to_config_dict_given_type() -> None:
     # New sub-class implementing Configurable, but passed as the type not an
     # instance.
     class SomeConfigurableType (Configurable):
-        def get_config(self) -> Dict[str, Any]:
-            return {}
+        def get_config(self) -> Dict[str, Any]: ...
+
     with pytest.raises(ValueError):
         # noinspection PyTypeChecker
         to_config_dict(SomeConfigurableType)  # type: ignore
@@ -433,6 +458,16 @@ def test_from_config_dict() -> None:
     assert isinstance(i, T1)
     assert i.foo == 256
     assert i.bar == "Some string value"
+
+    # Test other type instantiation
+    test_config['type'] = 'tests.test_configuration.T2'
+    i = from_config_dict(test_config, T_CLASS_SET)
+    assert isinstance(i, T2)
+    assert isinstance(i.child, T1)
+    assert i.child.foo == -1
+    assert i.child.bar == "some other value"
+    assert i.alpha == 1.0
+    assert i.beta == "euclidean"
 
 
 def test_from_config_dict_assertion_error() -> None:

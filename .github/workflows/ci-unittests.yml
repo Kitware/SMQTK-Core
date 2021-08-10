@@ -122,3 +122,9 @@ jobs:
       - name: Run Unittests
         run: poetry run pytest --cov=smqtk_core --cov-config=.pytest.coveragerc
 
+      - name: CodeCov report submission
+        uses: codecov/codecov-action@v1
+        with:
+          fail_ci_if_error: true
+          fails: coverage.xml
+          flags: unittests

@@ -17,7 +17,7 @@ class ClassDefinition(metaclass=abc.ABCMeta):
 class Derived(ClassDefinition):
 
     def cool_thing(self) -> str:
-        return "it's cool"
+        """ Some implementation, content doesn't matter. """
 
 
 class StillAbstract(ClassDefinition):

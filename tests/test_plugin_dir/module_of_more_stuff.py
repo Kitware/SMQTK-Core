@@ -10,7 +10,7 @@ class NewCustomType(argparse.ArgumentParser):
 
 class AnotherDerived(module_of_stuff.ClassDefinition):
     def cool_thing(self) -> str:
-        return "something different"
+        """ Some implementation, content doesn't matter. """
 
 
 nct_type = type(NewCustomType)

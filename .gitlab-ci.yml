@@ -79,4 +79,4 @@ test:unittests:
   image: $IMAGE
   script:
     - *test_setup  # expand `&test_setup` anchor above into here.
-    - poetry run pytest --cov=smqtk_core --cov-config=.pytest.coveragerc
+    - poetry run pytest

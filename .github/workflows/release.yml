@@ -1,0 +1,42 @@
+# This workflow is used to create a release
+
+name: Create Release
+
+on:
+  # Triggers the workflow on a tag push on master
+  push:
+    tags:
+      - v[0-9]+.[0-9]+.[0-9]+
+
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    container: python:3.6
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v2
+
+      - name: poetry install
+        run: pip install poetry
+
+      - name: Get tag
+        id: tag
+        run: echo ::set-output name=tag::${GITHUB_REF#refs/tags/}
+
+      - name: build project
+        run: poetry build
+
+      - name: Create release
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          bodyFile: "docs/release_notes/${{ steps.tag.outputs.tag }}.rst"
+
+      - name: Publish to PyPi
+        env:
+          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN}}
+        run: poetry publish

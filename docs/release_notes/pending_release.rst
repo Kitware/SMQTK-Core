@@ -24,6 +24,10 @@ Documentation
 
 * Update the "Libraries" section of the ``README.md`` file for more detail.
 
+* Added ``release.yml`` to github workflow to automate part of the release and
+  publishing process. Releases will now be triggered after a new tag is pushed
+  to the repo. The maintainer will no longer have to manually create releases
+  and manually publish to PYPI.
 
 Fixes
 -----

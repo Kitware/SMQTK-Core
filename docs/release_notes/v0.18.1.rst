@@ -1,0 +1,37 @@
+v0.18.1
+=======
+
+
+Updates / New Features
+----------------------
+
+CI
+
+* Added use of CodeCov. Fixed/added unittests to show 100% of test code,
+  e.g. no dead-code in the tests. CodeCov checks different coverage bars
+  for test and package scopes.
+
+Documentation
+
+* Added an FAQ to cover some basic questions about SMQTK as a whole.
+
+* Added additional examples around using the ``smqtk_core.configuration``
+  module: non-trivial constructor type configuration, and multiple-choice
+  configuration specification, generation and utilization.
+
+* Added a review process document that details how SMQTK PR's should be
+  reviewed.
+
+* Update the "Libraries" section of the ``README.md`` file for more detail.
+
+* Added ``release.yml`` to github workflow to automate part of the release and
+  publishing process. Releases will now be triggered after a new tag is pushed
+  to the repo. The maintainer will no longer have to manually create releases
+  and manually publish to PYPI.
+
+Fixes
+-----
+
+Documentation
+
+* Fix some white-space and indentation issues in the ``README.md`` file.

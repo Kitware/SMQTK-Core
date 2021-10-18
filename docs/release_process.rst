@@ -26,15 +26,12 @@ As such, patch releases should only ever be based on an existing release point.
    in the ``Z`` version component.
 
    a. Use ``poetry version patch`` to increase the patch value appropriately in
-      the :file:`pyproject.toml` file. This is important because the automated
-      release process will try to publish the version listed in this file and it
-      will error out if the version it tries to upload to PYPI already exists.
+      the :file:`pyproject.toml` file.
 
    b. Rename the ``docs/release_notes/pending_patch.rst`` file to
       ``docs/release_notes/v{VERSION}.rst``, matching the new version value.
       Add a descriptive paragraph under the title section summarizing this
-      release. During the automated process, this new, versioned file will referenced
-      to create the header of the release on Github.
+      release.
 
    c. Add a reference to the new release notes RST file in
       ``docs/release_notes.rst``.
@@ -42,13 +39,17 @@ As such, patch releases should only ever be based on an existing release point.
    d. In a separate commit, add back a blank pending release notes file stub.
       See `Stub Pending Notes File`_.
 
-2. Tag branch from the command line (see `Tag new version`_ below ). After the
-   tag is pushed, a CI check and build will automatically run. Should everything
-   pass without issue, the build will be published on PYPI. If the build or
-   tests fail, then an issue and branch should be created to address and solve
-   the errors before proceeding with the publishing of the branch.
+2. Create a pull/merge request for this branch with master as the merge target.
+   This is to ensure that everything passes CI testing before making the
+   release. If there is an issue then branches should be made and merged into
+   this branch until the issue is resolved.
 
-3. Merge version bump branch into ``master`` branch.
+3. Tag branch (see `Tag new version`_ below ) after resolving issues and before
+   merging into ``master``.
+
+4. Merge version bump branch into ``master`` branch.
+
+5. `Create new version release to PYPI`_
 
 Major and Minor Releases
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -58,16 +59,16 @@ and functionalities.
 1. Create a new branch off of the ``master`` named something like
    ``release-[major,minor]-{NEW_VERSION}``.
 
-   a. Use ``poetry version patch`` to increase the patch value appropriately in
-      the :file:`pyproject.toml` file. This is important because the automated
-      release process will try to publish the version listed in this file and it
-      will error out if the version it tries to upload to PYPI already exists.
+   a. Increment patch value in  ``pyproject.toml`` file's ``version`` attribute
+      under the `[tool.poetry]` section.
+
+      * See `Poetry's version command`_ for a convenient means of incrementing
+        the version.
 
    b. Rename the ``docs/release_notes/pending_release.rst`` file to
       ``docs/release_notes/v{VERSION}.rst``, matching the new version value.
       Add a descriptive paragraph under the title section summarizing this
-      release. During the automated process, this new, versioned file will referenced
-      to create the header of the release on Github.
+      release.
 
    c. Add a reference to the new release notes RST file in
       ``docs/release_notes.rst``.
@@ -75,14 +76,17 @@ and functionalities.
    d. In a separate commit, add back a blank pending release notes file stub.
       See `Stub Pending Notes File`_.
 
-2. Tag branch from the command line (see `Tag new version`_ below ). After the
-   tag is pushed, a CI check and build will automatically run. Should everything
-   pass without issue, the build will be published on PYPI. If the build or
-   tests fail, then an issue and branch should be created to address and solve
-   the errors before proceeding with the publishing of the branch.
+2. Create a pull/merge request for this branch with master as the merge target.
+   This is to ensure that everything passes CI testing before making the
+   release. If there is an issue then branches should be made and merged into
+   this branch until the issue is resolved.
 
-3. Merge version bump branch into the ``master`` branch.
+3. Tag branch (see `Tag new version`_ below) after resolving issues and before
+   merging into ``master``.
 
+4. Merge version bump branch into the ``master`` branch.
+
+5. `Create new version release to PYPI`_
 
 Stub Pending Notes File
 ^^^^^^^^^^^^^^^^^^^^^^^

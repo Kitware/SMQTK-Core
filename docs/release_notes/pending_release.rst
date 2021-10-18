@@ -13,5 +13,7 @@ Miscellaneous
 * Removed CODE_OF_CONDUCT file. This is not something that we can enforce
   at this time so it will be removed.
 
+* Add SMQTK-Descriptors to the ``README.md`` package list and graphic.
+
 Fixes
 -----

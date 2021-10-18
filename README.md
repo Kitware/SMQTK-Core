@@ -32,6 +32,9 @@ Some above-mentioned packages supporting AI/ML topics include the following:
 * [SMQTK-Classifier] provides
   interfaces and implementations around black-box classification.
 
+* [SMQTK-Detection] provides interfaces and support for black-box object
+  detection.
+
 * [SMQTK-Indexing] provides
   interfaces and implementations for efficient, large-scale indexing of
   descriptor vectors.
@@ -107,5 +110,6 @@ firefox _build/html/index.html
 [SMQTK-Image-IO]: https://github.com/Kitware/SMQTK-Image-IO
 [SMQTK-Descriptors]: https://github.com/Kitware/SMQTK-Descriptors
 [SMQTK-Classifier]: https://github.com/Kitware/SMQTK-Classifier
+[SMQTK-Detection]: https://github.com/Kitware/SMQTK-Detection
 [SMQTK-Indexing]: https://github.com/Kitware/SMQTK-Indexing
 [SMQTK-Relevancy]: https://github.com/Kitware/SMQTK-Relevancy

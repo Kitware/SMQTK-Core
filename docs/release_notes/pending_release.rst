@@ -8,6 +8,10 @@ CI
 
 * Revert release CI action that was over eager to make releases.
 
+Contribution Guide
+
+* Add instructions to update pending release when making a contribution.
+
 Miscellaneous
 
 * Removed CODE_OF_CONDUCT file. This is not something that we can enforce

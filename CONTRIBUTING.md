@@ -18,11 +18,13 @@ See the [SMQTK-Core README] file for additional information.
         $ git add <file1> <file2> ...
         $ git commit
 
-4.  Push topic branch with commits to your fork in GitHub:
+4.  Add summary of changes in [pending release notes].
+
+5.  Push topic branch with commits to your fork in GitHub:
 
         $ git push origin HEAD -u
 
-5.  Visit the Kitware SMQTK-Core Github, browse to the "Pull requests" tab
+6.  Visit the Kitware SMQTK-Core Github, browse to the "Pull requests" tab
     and click on the "New pull request" button in the upper-right.
     Click on the "compare across forks" link, browse to your fork and browse to
     the topic branch to submit for the pull request.
@@ -38,3 +40,4 @@ Sphinx is used for manual and automatic API [documentation].
 
 [SMQTK-Core README]: README.md
 [documentation]: docs/
+[pending release notes]: docs/release_notes/pending_release.rst

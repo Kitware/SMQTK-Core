@@ -39,17 +39,20 @@ As such, patch releases should only ever be based on an existing release point.
    d. In a separate commit, add back a blank pending release notes file stub.
       See `Stub Pending Notes File`_.
 
-2. Create a pull/merge request for this branch with master as the merge target.
+2. Push the created branch to the upstream repository, not your fork (this is
+   an exception to the normal forky workflow).
+
+3. Create a pull/merge request for this branch with master as the merge target.
    This is to ensure that everything passes CI testing before making the
    release. If there is an issue then branches should be made and merged into
    this branch until the issue is resolved.
 
-3. Tag branch (see `Tag new version`_ below ) after resolving issues and before
+4. Tag branch (see `Tag new version`_ below ) after resolving issues and before
    merging into ``master``.
 
-4. Merge version bump branch into ``master`` branch.
+5. Merge version bump branch into ``master`` branch.
 
-5. `Create new version release to PYPI`_
+6. `Create new version release to PYPI`_
 
 Major and Minor Releases
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -76,17 +79,20 @@ and functionalities.
    d. In a separate commit, add back a blank pending release notes file stub.
       See `Stub Pending Notes File`_.
 
-2. Create a pull/merge request for this branch with master as the merge target.
+2. Push the created branch to the upstream repository, not your fork (this is
+   an exception to the normal forky workflow).
+
+3. Create a pull/merge request for this branch with master as the merge target.
    This is to ensure that everything passes CI testing before making the
    release. If there is an issue then branches should be made and merged into
    this branch until the issue is resolved.
 
-3. Tag branch (see `Tag new version`_ below) after resolving issues and before
+4. Tag branch (see `Tag new version`_ below) after resolving issues and before
    merging into ``master``.
 
-4. Merge version bump branch into the ``master`` branch.
+5. Merge version bump branch into the ``master`` branch.
 
-5. `Create new version release to PYPI`_
+6. `Create new version release to PYPI`_
 
 Stub Pending Notes File
 ^^^^^^^^^^^^^^^^^^^^^^^

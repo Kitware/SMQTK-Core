@@ -12,6 +12,11 @@ Contribution Guide
 
 * Add instructions to update pending release when making a contribution.
 
+Documentation
+
+* Update release instructions to be clear on where to push created release
+  branches.
+
 Plugin
 
 * Add a suggestion to fix `NotAModuleError`.

@@ -28,5 +28,8 @@ Miscellaneous
 
 * Add SMQTK-Descriptors to the ``README.md`` package list and graphic.
 
+* Add script to help with updating versioning and updating changelog during
+  the release process
+
 Fixes
 -----

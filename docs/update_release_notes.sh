@@ -1,4 +1,14 @@
 #!/bin/bash
+#
+# Script to help with the SMQTK release process. Performs the following steps:
+#   - Poetry version (major, minor, or patch)
+#   - Rename release_notes/pending_release file to release_notes/version
+#   - Add reference to new release notes file in release_notes.rst
+#   - Add new release notes stub file
+#
+# Two git commits are created. One for the version bump and one for the new
+# release notes stub file.
+#
 
 # Check args
 if [ $# != 1 ]

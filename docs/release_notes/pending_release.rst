@@ -6,7 +6,8 @@ Updates / New Features
 
 CI
 
-* Revert release CI action that was over eager to make releases.
+* Add check for repository owner during release workflow and only
+  publish if the owner is Kitware
 
 Contribution Guide
 

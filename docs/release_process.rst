@@ -25,19 +25,13 @@ As such, patch releases should only ever be based on an existing release point.
    like ``release-patch-{NEW_VERSION}``, where ``NEW_VERSION`` is an increase
    in the ``Z`` version component.
 
-   a. Use ``poetry version patch`` to increase the patch value appropriately in
-      the :file:`pyproject.toml` file.
+   a. Use the ``scripts/update_release_notes.sh`` script to update the project
+      version number, create ``docs/release_notes/v{VERSION}.rst``, and add a
+      new pending release notes stub file.
+        Ex: ./update_release_notes.sh patch
 
-   b. Rename the ``docs/release_notes/pending_patch.rst`` file to
-      ``docs/release_notes/v{VERSION}.rst``, matching the new version value.
-      Add a descriptive paragraph under the title section summarizing this
-      release.
-
-   c. Add a reference to the new release notes RST file in
-      ``docs/release_notes.rst``.
-
-   d. In a separate commit, add back a blank pending release notes file stub.
-      See `Stub Pending Notes File`_.
+   b. Add a descriptive paragraph under the title section of
+      ``docs/release_notes/v{VERSION}.rst`` summarizing this release.
 
 2. Push the created branch to the upstream repository, not your fork (this is
    an exception to the normal forky workflow).
@@ -62,22 +56,13 @@ and functionalities.
 1. Create a new branch off of the ``master`` named something like
    ``release-[major,minor]-{NEW_VERSION}``.
 
-   a. Increment patch value in  ``pyproject.toml`` file's ``version`` attribute
-      under the `[tool.poetry]` section.
+   a. Use the ``scripts/update_release_notes.sh`` script to update the project
+      version number, create ``docs/release_notes/v{VERSION}.rst``, and add a
+      new pending release notes stub file.
+        Ex: ./update_release_notes.sh minor
 
-      * See `Poetry's version command`_ for a convenient means of incrementing
-        the version.
-
-   b. Rename the ``docs/release_notes/pending_release.rst`` file to
-      ``docs/release_notes/v{VERSION}.rst``, matching the new version value.
-      Add a descriptive paragraph under the title section summarizing this
-      release.
-
-   c. Add a reference to the new release notes RST file in
-      ``docs/release_notes.rst``.
-
-   d. In a separate commit, add back a blank pending release notes file stub.
-      See `Stub Pending Notes File`_.
+   b. Add a descriptive paragraph under the title section of
+      ``docs/release_notes/v{VERSION}.rst`` summarizing this release.
 
 2. Push the created branch to the upstream repository, not your fork (this is
    an exception to the normal forky workflow).

@@ -38,7 +38,7 @@ As such, patch releases should only ever be based on an existing release point.
 
 3. Create a pull/merge request for this branch with master as the merge target.
    This is to ensure that everything passes CI testing before making the
-   release. If there is an issue then branches should be made and merged into
+   release. If there is an issue, then branches should be made and merged into
    this branch until the issue is resolved.
 
 4. Tag branch (see `Tag new version`_ below ) after resolving issues and before
@@ -69,7 +69,7 @@ and functionalities.
 
 3. Create a pull/merge request for this branch with master as the merge target.
    This is to ensure that everything passes CI testing before making the
-   release. If there is an issue then branches should be made and merged into
+   release. If there is an issue, then branches should be made and merged into
    this branch until the issue is resolved.
 
 4. Tag branch (see `Tag new version`_ below) after resolving issues and before
@@ -107,13 +107,13 @@ release.
 From GitHub
 ^^^^^^^^^^^
 Navigate to the `releases page on GitHub`_ and click the ``Draft a new
-release`` button in upper right.
+release`` button in the upper right.
 
 Fill in the new version in the ``Tag version`` text box (e.g. ``v#.#.#``)
 and use the same string in the ``Release title`` text box.
 The "@" target should be the release branch created above.
 
-Copy and past this version's release notes into the ``Describe this release``
+Copy and paste this version's release notes into the ``Describe this release``
 text box.
 
 Remember to check the ``This is a pre-release`` check-box if appropriate.

@@ -47,4 +47,4 @@ jobs:
 
           git checkout ${{ github.ref_name }}
           poetry config pypi-token.pypi ${{ secrets.PYPI_TOKEN }}
-          poetry publish --build --dry-run
+          poetry publish --build

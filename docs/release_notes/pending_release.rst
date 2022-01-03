@@ -6,8 +6,10 @@ Updates / New Features
 
 CI
 
-* Add check for repository owner during release workflow and only
-  publish if the owner is Kitware
+* Reverted previous release automation due to unintended side-effects.
+  Created a revised publish action to more simply publish the package to pypi,
+  guarding against activating on fork of the repository.
+  This workflow has been made to be reusable by other repositories' workflows.
 
 Contribution Guide
 

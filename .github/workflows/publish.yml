@@ -7,6 +7,13 @@ on:
       # Only run on tags with official version tag release format (e.g. v1.0.1)
       - "v[0-9].[0-9]+.[0-9]+"
 
+  # Allow use of this workflow as a reusable workflow.
+  # https://docs.github.com/en/actions/learn-github-actions/reusing-workflows
+  workflow_call:
+    secrets:
+      PYPI_TOKEN:
+        required: true
+
 defaults:
   run:
     shell: bash
@@ -17,6 +24,7 @@ defaults:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    container: python:3.6
     if: github.repository_owner == 'Kitware'
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -38,13 +46,16 @@ jobs:
           key: python-3.6-${{ hashFiles('poetry.lock') }}
           restore-keys: |
             python-3.6-
+
       - name: Setup Environment
-        uses: ./.github/actions/python-poetry-setup
+        # Using non-relative path for correct behavior when used as a remote
+        # workflow.
+        uses: Kitware/SMQTK-Core/.github/actions/python-poetry-setup@master
 
       - name: Publish
+        env:
+          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN}}
         run: |
           echo "Publishing new tag: ${{ github.ref_name }}"
-
           git checkout ${{ github.ref_name }}
-          poetry config pypi-token.pypi ${{ secrets.PYPI_TOKEN }}
           poetry publish --build

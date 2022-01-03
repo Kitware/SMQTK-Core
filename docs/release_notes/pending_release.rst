@@ -36,3 +36,7 @@ Miscellaneous
 
 Fixes
 -----
+
+* Update the locked version of urllib3 to address a security vulnerability.
+  Due to this being an implicit dependency, this change only affects those who
+  create development environments from this repo using `poetry`.

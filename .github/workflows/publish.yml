@@ -56,6 +56,11 @@ jobs:
         env:
           POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN}}
         run: |
+          if [[ -z "$POETRY_PYPI_TOKEN_PYPI" ]]
+          then
+            echo "ERROR: Input pypi token was blank. Did you forget to set the appropriate secret?"
+            exit 1
+          fi
           echo "Publishing new tag: ${{ github.ref_name }}"
           git checkout ${{ github.ref_name }}
           poetry publish --build

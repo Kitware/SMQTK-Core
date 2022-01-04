@@ -79,22 +79,6 @@ and functionalities.
 
 6. `Create new version release to PYPI`_
 
-Stub Pending Notes File
-^^^^^^^^^^^^^^^^^^^^^^^
-The following is the basic content that goes into the stub pending release
-notes file:
-
-.. code-block::
-
-    Pending Release Notes
-    =====================
-
-    Updates / New Features
-    ----------------------
-
-    Fixes
-    -----
-
 Tag new version
 ---------------
 Release branches should be tagged in order to record where in the git tree a

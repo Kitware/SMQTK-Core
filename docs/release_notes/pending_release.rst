@@ -11,6 +11,9 @@ CI
   guarding against activating on fork of the repository.
   This workflow has been made to be reusable by other repositories' workflows.
 
+* Also run CI unittests for PRs targetting branches that match the `release*`
+    glob.
+
 Contribution Guide
 
 * Add instructions to update pending release when making a contribution.

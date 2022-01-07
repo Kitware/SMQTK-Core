@@ -11,6 +11,7 @@ on:
   pull_request:
     branches:
       - master
+      - release*
   schedule:
     # Nightly run unit tests to check for implicit dependency issues between pull requests.
     - cron: '0 0 * * *'

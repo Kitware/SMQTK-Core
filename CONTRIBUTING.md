@@ -60,13 +60,17 @@ There may also be additional ``release-v<MAJOR>.<MINOR>`` branches that may be
 used as a branching off point to create patch branches for releases older than
 the most current release.
 
-If your PR is a bug fix, unit testing improvement, or documentation enhancement
-that applies to the last release, please branch off of ``release`` and submit
-your PR to the ``release`` branch.
-If your PR is a new feature or bug fix that applies to ``master`` but not to
-``release`` then submit your PR to the``master`` branch.
-Any PR accepted in ``release`` is also accepted into ``master``, but not vice
-versa.
+Some Pull Request ("PR") branch basing guidance:
+* If your PR is a bug fix that applies to the last release, please branch off
+  of ``release`` and submit your PR to the ``release`` branch.
+* If your PR is a bug fix to a previous patch release of a major or minor
+  version, please branch off of the latest patch release of that major or minor
+  version.
+* If your PR is a new feature or bug fix that applies to ``master`` but not to
+  ``release`` then submit your PR to the``master`` branch.
+
+Any PR accepted in ``release`` is implicitly accepted into ``master``, but not
+vice versa.
 
 ### Branch Naming
 Topic branches should be named starting with a ``dev/`` prefix to distinguish

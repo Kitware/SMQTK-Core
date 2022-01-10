@@ -21,7 +21,7 @@ Contribution Guide
 Documentation
 
 * Update release instructions to be clear on where to push created release
-  branches.
+  branches. This now includes instructions related to a ``release`` branch.
 
 * Expanded top-level contributing document with more details.
 

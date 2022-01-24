@@ -42,6 +42,11 @@ Miscellaneous
 Fixes
 -----
 
+Dependency Versions
+
 * Update the locked version of urllib3 to address a security vulnerability.
   Due to this being an implicit dependency, this change only affects those who
   create development environments from this repo using `poetry`.
+
+* Update the developer dependency and locked version of ipython to address a
+  security vulnerability.

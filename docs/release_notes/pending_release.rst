@@ -39,6 +39,8 @@ Miscellaneous
 * Add script to help with updating versioning and updating changelog during
   the release process
 
+* Updated README to include reference to the SMQTK-IQR package.
+
 Fixes
 -----
 

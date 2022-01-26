@@ -48,8 +48,13 @@ detection [
 ];
 relevancy [
     label="SMQTK-Relevancy",
-    width=3,
+    width=2,
     URL="https://github.com/Kitware/SMQTK-Relevancy",
+];
+iqr [
+    label="SMQTK-IQR",
+    width=3,
+    URL="https://github.com/Kitware/SMQTK-IQR",
 ];
 
 {rank=same; core;}
@@ -57,6 +62,7 @@ relevancy [
 {rank=same; descriptors imageio;}
 {rank=same; classifier indexing;}
 {rank=same; detection relevancy;}
+{rank=same; iqr;}
 
 dataprovider -> core;
 imageio -> dataprovider;
@@ -66,7 +72,8 @@ detection -> classifier [constraint=false];
 indexing -> descriptors;
 classifier -> descriptors;
 relevancy -> classifier;
-relevancy -> indexing;
+iqr -> relevancy;
+iqr -> indexing;
 
 }
 

@@ -14,6 +14,9 @@ CI
 * Also run CI unittests for PRs targetting branches that match the `release*`
     glob.
 
+* Added additional step in unittest workflow to install optional package
+  requirements.
+
 Contribution Guide
 
 * Add instructions to update pending release when making a contribution.

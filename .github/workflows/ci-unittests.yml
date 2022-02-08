@@ -79,7 +79,6 @@ jobs:
       - name: Typecheck with MyPy
         run: poetry run mypy
 
-  # This workflow contains a single job called "build"
   pytest:
     # Running in containers, so this unknown environment is fine.
     runs-on: ubuntu-latest
@@ -87,6 +86,10 @@ jobs:
     strategy:
       matrix:
         python-version: [3.6, 3.7, 3.8, 3.9]
+        # Extras for included, optional plugin support (space-separated lists)
+        opt-extra: [
+            "",  # no extras
+        ]
       # We want all python versions tested even if one of them happens to fail
       fail-fast: false
 
@@ -119,6 +122,15 @@ jobs:
 
       - name: Setup Environment
         uses: ./.github/actions/python-poetry-setup
+
+      - name: Optionally install additional requirements
+        env:
+          OPT_EXTRA: ${{ matrix.opt-extra }}
+        run: |
+          if [[ -n "$OPT_EXTRA" ]]
+          then
+            poetry install --extras "$OPT_EXTRA"
+          fi
 
       - name: Run Unittests
         run: poetry run pytest

@@ -123,7 +123,8 @@ When making a topic branch, included in its commits should be additions to the
 [pending release notes] file.
 These additions should be short, descriptive summaries of the updates,
 features or fixes that have been added in the form of bullet points under
-applicable sections.
+applicable sections. In order to maintain consistency, these additions should
+be written in the past tense (e.g. "Updated" or "Added").
 There are broad sections for "Updates" (features or enhancements) and "Fixes"
 (typos, bug fixes, etc.).
 Most changes based on a ``release`` branch go under "Fixes", and most changes

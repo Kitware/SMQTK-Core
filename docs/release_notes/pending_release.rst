@@ -11,11 +11,13 @@ CI
   guarding against activating on fork of the repository.
   This workflow has been made to be reusable by other repositories' workflows.
 
-* Modified CI unittests workflow to run for PRs targetting branches that match
+* Modified CI unittests workflow to run for PRs targeting branches that match
   the `release*` glob.
 
 * Added additional step in unittest workflow to install optional package
   requirements.
+
+* Reduced CodeCov report submission by skipping this step on scheduled runs.
 
 Contribution Guide
 

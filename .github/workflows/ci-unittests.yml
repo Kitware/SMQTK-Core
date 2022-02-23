@@ -136,6 +136,7 @@ jobs:
         run: poetry run pytest
 
       - name: CodeCov report submission
+        if: ${{ github.event_name != 'schedule' }}
         uses: codecov/codecov-action@v1
         with:
           fail_ci_if_error: true

@@ -146,7 +146,7 @@ commit hash, and ``UPSTREAM`` with the appropriate remote name.
 .. code-block:: bash
 
    $ git checkout HASH
-   # VERSION="v${poetry version -s}"
+   # VERSION="v$(poetry version -s)"
    $ git tag -a "$VERSION" -F docs/release_notes/"$VERSION".rst
    $ git push UPSTREAM "$VERSION"
 

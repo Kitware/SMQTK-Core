@@ -51,7 +51,7 @@ and functionalities.
 
 7. As a repository administrator, merge the ``release`` branch into ``master``
    locally and push the updated ``master`` to upstream. (Replace "upstream"
-   with your applicable remote name.)
+   in the example below with your applicable remote name.)
 
    .. code-block:: bash
 

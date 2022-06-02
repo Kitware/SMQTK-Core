@@ -42,7 +42,7 @@ Miscellaneous
 * Added SMQTK-Descriptors to the ``README.md`` package list and graphic.
 
 * Added script to help with updating versioning and updating changelog during
-  the release process
+  the release process.
 
 * Updated README to include reference to the SMQTK-IQR package.
 

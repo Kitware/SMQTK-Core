@@ -51,7 +51,7 @@ and functionalities.
 
 7. As a repository administrator, merge the ``release`` branch into ``master``
    locally and push the updated ``master`` to upstream. (Replace "upstream"
-   with your applicable remote name.)
+   in the example below with your applicable remote name.)
 
    .. code-block:: bash
 
@@ -68,9 +68,9 @@ No new features or functionality should be introduced in a patch release.
 As such, patch releases should only ever be based on an existing release point
 (git tag).
 
-This list assumes the creation of a patch release off of the latest release
-version, i.e. off of the ``release`` branch.
-If a patch release for a non-latest version is being created, see the
+This list assumes we are creating a new patch release off of the *latest*
+release version, i.e. off of the ``release`` branch.
+If a patch release for an older release version is being created, see the
 `Patching an Older Release`_ section.
 
 1. Create a new branch off of the ``release`` branch named something like
@@ -126,7 +126,8 @@ When all fix branches have been integrated, follow the `Patch Release`_ section
 above, replacing ``release`` branch references (merge target) to be the
 ``release-...`` integration branch.
 Step 6 should be to merge this release integration branch into ``release``
-first, and *then* ``release`` into ``master``.
+first, and *then* ``release`` into ``master``, if applicable (some patches may
+only make sense for specific versions).
 
 Tag new version
 ---------------
@@ -142,11 +143,13 @@ above described ``update-to-v{NEW_VERSION}`` topic-branch ("the release").
 
 See the example commands below, replacing ``HASH`` with the appropriate git
 commit hash, and ``UPSTREAM`` with the appropriate remote name.
+We show using `Poetry's version command`_ to consistently access the current
+package version.
 
 .. code-block:: bash
 
    $ git checkout HASH
-   # VERSION="v${poetry version -s}"
+   # VERSION="v$(poetry version -s)"
    $ git tag -a "$VERSION" -F docs/release_notes/"$VERSION".rst
    $ git push UPSTREAM "$VERSION"
 
@@ -161,6 +164,6 @@ text box.
 Remember to check the ``This is a pre-release`` check-box if appropriate.
 Click the ``Public release`` button at the bottom of the page when complete.
 
+
 .. _Poetry's version command: https://python-poetry.org/docs/cli/#version
 .. _releases page on GitHub: https://github.com/Kitware/SMQTK-Core/releases
-.. _tags page on GitHub: https://github.com/Kitware/SMQTK-Core/tags

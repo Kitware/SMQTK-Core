@@ -46,6 +46,8 @@ Miscellaneous
 
 * Updated README to include reference to the SMQTK-IQR package.
 
+* Periodic update of pinned dependency versions in lock file.
+
 Fixes
 -----
 

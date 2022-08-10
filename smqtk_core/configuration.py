@@ -584,7 +584,9 @@ def configuration_test_helper(inst: C,
     inst_config = inst.get_config()
 
     # Keys in default and instance configurations should also match.
-    assert set(dflt_cfg) == set(inst_config)
+    assert set(dflt_cfg) == set(inst_config), \
+        "Input configuration and `get_config` output keys are not congruent. " \
+        "Check that `get_config` output matches constructor input?"
 
     inst2 = inst_T.from_config(inst_config, *from_config_args)
     inst2_config = inst2.get_config()

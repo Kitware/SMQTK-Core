@@ -48,6 +48,8 @@ Miscellaneous
 
 * Periodic update of pinned dependency versions in lock file.
 
+* Added missing assert failure message to configuration test helper.
+
 Fixes
 -----
 

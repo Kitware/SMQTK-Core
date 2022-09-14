@@ -48,6 +48,8 @@ from typing import cast, Any, Collection, FrozenSet, Iterable, Set, Type, TypeVa
 
 # Before 3.8, we depend on importlib_metadata >=3.7.0, which is in parity with
 # the python version 3.10+ `importlib.metadata.entry_points`.
+# After 3.10, the method of accessing entrypoints is the same as when using the
+# importlib_metadata package.
 # This comparison IS NOT CHAINED on purpose to support mypy compatibility.
 # noinspection PyChainedComparisons
 if sys.version_info >= (3, 8) and sys.version_info < (3, 10):
@@ -56,7 +58,11 @@ if sys.version_info >= (3, 8) and sys.version_info < (3, 10):
     def get_ns_entrypoints(ns: str) -> Iterable["metadata.EntryPoint"]:
         return metadata.entry_points().get(ns, ())
 else:
-    import importlib_metadata as metadata
+    if sys.version_info < (3, 8):
+        import importlib_metadata as metadata
+    else:
+        # must be >=3.10
+        import importlib.metadata as metadata
 
     def get_ns_entrypoints(ns: str) -> Iterable["metadata.EntryPoint"]:
         return metadata.entry_points(group=ns)  # lgtm [py/call/wrong-named-argument]

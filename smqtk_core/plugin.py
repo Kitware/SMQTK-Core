@@ -159,7 +159,7 @@ def _collect_types_in_module(module: types.ModuleType) -> Set[Type]:
 def discover_via_env_var(env_var: str) -> Set[Type]:
     """
     Discover and return types specified in python-importable modules
-    specified in the the given environment variable.
+    specified in the given environment variable.
 
     We expect the given environment variable to define zero or more python
     module paths from which to yield all contained type definitions (i.e.
@@ -299,7 +299,7 @@ def discover_via_subclasses(interface_type: Type) -> Set[Type]:
     depending on the import state at the time of invocation. E.g. further
     imports may increase the quantity of returns from this function.
 
-    This function uses depth-first-search when traversing sub-class tree.
+    This function uses depth-first-search when traversing subclass tree.
 
     Reference:
       https://docs.python.org/3/library/stdtypes.html#class.__subclasses__
@@ -310,7 +310,7 @@ def discover_via_subclasses(interface_type: Type) -> Set[Type]:
           gc.collect()` wipes out the return as long as it's not referenced, of
           course as long as its reference is not retained by something.
 
-    :param interface_type: The interface type to recursively find sub-classes
+    :param interface_type: The interface type to recursively find subclasses
         under.
     :return: Set of recursive subclass types under `interface_type`.
     """
@@ -320,7 +320,7 @@ def discover_via_subclasses(interface_type: Type) -> Set[Type]:
 
     # Use a list (stack behavior) to track the descendant classes of
     # `interface_type`. Depth- vs. Breadth-first search should not matter here,
-    # so just using just using lists here for theoretically more optimal array
+    # so just using lists here for theoretically more optimal array
     # caching.
     candidates = interface_type.__subclasses__()
     while candidates:
@@ -367,7 +367,7 @@ class Pluggable(metaclass=abc.ABCMeta):
     This mixin class adds an assertive check during instance construction that
     the derived type is "usable" by invoking its `is_usable()` class-method
     within this type's `__new__` method.
-    This is happening in `__new__` specifically for a couple reasons:
+    This is happening in `__new__` specifically for a couple of reasons:
 
         * Sub-classes do not have to explicitly invoke super to inherit this
           safety functionality.
@@ -377,7 +377,7 @@ class Pluggable(metaclass=abc.ABCMeta):
 
     **NOTE:** In a multiple inheritance scenario with another type that also
     implements `__new__`, this class should be listed to the right-hand-side
-    so as to be later in the MRO. Otherwise, this will cut off arguments from
+    to be later in the MRO. Otherwise, this will cut off arguments from
     being sent to the super `__new__` as we simply consider the locally parent
     type of `object` when calling our `super().__new__`.
     """
@@ -402,7 +402,7 @@ class Pluggable(metaclass=abc.ABCMeta):
 
         :return: Set of discovered class types that are considered "valid"
             plugins of this type. See :py:func:`is_valid_plugin` for what we
-            define a "valid" type to be be relative to this class.
+            define a "valid" type to be relative to this class.
 
         """
         candidate_types = {
@@ -428,7 +428,7 @@ class Pluggable(metaclass=abc.ABCMeta):
         usable. When this method returns `True`, the class is declaring that it
         should be constructable and usable in the current environment.
 
-        By default, this method will return True unless a sub-class overrides
+        By default, this method will return True unless a subclass overrides
         this class-method with their specific logic.
 
         NOTES:

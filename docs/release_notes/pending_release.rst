@@ -23,6 +23,13 @@ Contribution Guide
 
 * Added instructions to update pending release when making a contribution.
 
+Dependencies
+
+* Updated minimum required python version to 3.7 to follow python end of life.
+
+* Updated development abstract dep versions to "*" since we do not currently
+  require any specific versions.
+
 Documentation
 
 * Updated release instructions to be clear on where to push created release
@@ -52,15 +59,3 @@ Miscellaneous
 
 Fixes
 -----
-
-Dependency Versions
-
-* Updated the locked version of urllib3 to address a security vulnerability.
-  Due to this being an implicit dependency, this change only affects those who
-  create development environments from this repo using `poetry`.
-
-* Updated the developer dependency and locked version of ipython to address a
-  security vulnerability.
-
-* Removed `jedi = "^0.17.2"` requirement since recent `ipython = "^7.17.3"`
-  update appropriately addresses the dependency.

@@ -19,12 +19,12 @@ defaults:
     shell: bash
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
-# NOTE: Github actions does not support anchors apparently. Forgive duplication of job
+# NOTE: GitHub actions does not support anchors, apparently. Forgive duplication of job
 #       steps.
 jobs:
   publish:
     runs-on: ubuntu-latest
-    container: python:3.6
+    container: python:3.7
     if: github.repository_owner == 'Kitware'
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -43,9 +43,9 @@ jobs:
             ~/.cache/pip
             ~/.cache/pypoetry/virtualenvs/
             ~/.local
-          key: python-3.6-${{ hashFiles('poetry.lock') }}
+          key: python-3.7-${{ hashFiles('poetry.lock') }}
           restore-keys: |
-            python-3.6-
+            python-3.7-
 
       - name: Setup Environment
         # Using non-relative path for correct behavior when used as a remote

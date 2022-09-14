@@ -268,9 +268,14 @@ def discover_via_entrypoint_extensions(entrypoint_ns: str) -> Set[Type]:
     for entry_point in get_ns_entrypoints(entrypoint_ns):
         m = entry_point.load()
         if not isinstance(m, types.ModuleType):
+            # Type ignoring here has to do with mypy in py3.7 not recognizing
+            # these attributes, which are indeed valid, as existing in the
+            # EntryPoint namedtuple.
+            ep_name = entry_point.name  # type: ignore[attr-defined]
+            ep_val = entry_point.value  # type: ignore[attr-defined]
             raise NotAModuleError(
-                f"An entrypoint with key '{entry_point.name}' and value "
-                f"'{entry_point.value}' did not specify a module (got an "
+                f"An entrypoint with key '{ep_name}' and value "
+                f"'{ep_val}' did not specify a module (got an "
                 f"object of type `{type(m).__name__}` instead): {m}\n"
                 "A common cause for the issue is using an unsupported "
                 "entrypoint specification along the lines of "

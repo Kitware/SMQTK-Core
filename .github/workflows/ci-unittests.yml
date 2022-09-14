@@ -25,7 +25,7 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
-    container: python:3.6
+    container: python:3.7
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
@@ -43,9 +43,9 @@ jobs:
             ~/.cache/pip
             ~/.cache/pypoetry/virtualenvs/
             ~/.local
-          key: python-3.6-${{ hashFiles('poetry.lock') }}
+          key: python-3.7-${{ hashFiles('poetry.lock') }}
           restore-keys: |
-            python-3.6-
+            python-3.7-
       - name: Setup Environment
         uses: ./.github/actions/python-poetry-setup
       - name: Lint with Flake8
@@ -53,7 +53,7 @@ jobs:
 
   typecheck:
     runs-on: ubuntu-latest
-    container: python:3.6
+    container: python:3.7
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
@@ -71,9 +71,9 @@ jobs:
             ~/.cache/pip
             ~/.cache/pypoetry/virtualenvs/
             ~/.local
-          key: python-3.6-${{ hashFiles('poetry.lock') }}
+          key: python-3.7-${{ hashFiles('poetry.lock') }}
           restore-keys: |
-            python-3.6-
+            python-3.7-
       - name: Setup Environment
         uses: ./.github/actions/python-poetry-setup
       - name: Typecheck with MyPy
@@ -85,7 +85,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: [3.6, 3.7, 3.8, 3.9]
+        python-version: ["3.7", "3.8", "3.9", "3.10"]
         # Extras for included, optional plugin support (space-separated lists)
         opt-extra: [
             "",  # no extras

@@ -57,5 +57,7 @@ Miscellaneous
 
 * Added missing assert failure message to configuration test helper.
 
+* Added properties file for use with SonarQube and SonarCloud.
+
 Fixes
 -----

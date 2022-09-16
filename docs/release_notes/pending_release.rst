@@ -19,6 +19,8 @@ CI
 
 * Reduced CodeCov report submission by skipping this step on scheduled runs.
 
+* Update code-cov action usage to use v3.
+
 Contribution Guide
 
 * Added instructions to update pending release when making a contribution.
@@ -40,6 +42,10 @@ Documentation
 Plugin
 
 * Added a suggestion to fix `NotAModuleError`.
+
+* Removed __new__ override to prevent construction of "not usable"
+  implementations. This feature has never been observed/utilized in the wild
+  and it's removal simplifies tool interactions and use complexity.
 
 Miscellaneous
 

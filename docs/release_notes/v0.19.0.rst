@@ -1,0 +1,88 @@
+v0.19.0
+=======
+This minor update brings in a number of repository updates, deprecates python
+3.6 support, and deprecates the `__new__` override in the `Pluggable` mixin
+interface to make it easier to use under real-world conditions.
+
+Most repository updates have revolved around stream lining the mechanics going
+into creating and publishing releases.
+
+The override of `__new__` provided functionality that, from experience and
+observation, was never actually made use of or added any actual security to
+anything. This feature came at the cost of interrupting some downstream tools
+(e.g. in ipython when inspecting a class with the ?-suffix) and adding
+complexity in how Pluggable needed to be used in defining interfaces (multiple
+inheritance and mixin UX). With the feature not being used, these costs don't
+make any sense any more. Thus, this override was removed for simplicity. Now,
+"not usable" implementations may be manually constructed if the user really
+desires to, under the presumption that manual construction implies manual
+consent. The `is_usable()` class method of course still exists and super-logic
+may continue to make use of it in relation to use-prevention or use-warning
+logic.
+
+Updates / New Features
+----------------------
+
+CI
+
+* Reverted previous release automation due to unintended side-effects.
+  Created a revised publish action to more simply publish the package to pypi,
+  guarding against activating on forks of the repository.
+  This workflow has been made to be reusable by other repositories' workflows.
+
+* Modified CI unittests workflow to run for PRs targeting branches that match
+  the `release*` glob.
+
+* Added additional step in unittest workflow to install optional package
+  requirements.
+
+* Reduced CodeCov report submission by skipping this step on scheduled runs.
+
+* Update code-cov action usage to use v3.
+
+Contribution Guide
+
+* Added instructions to update pending release when making a contribution.
+
+Dependencies
+
+* Updated minimum required python version to 3.7 to follow python end of life.
+
+* Updated development abstract dep versions to "*" since we do not currently
+  require any specific versions.
+
+Documentation
+
+* Updated release instructions to be clear on where to push created release
+  branches. This now includes instructions related to a ``release`` branch.
+
+* Expanded top-level contributing document with more details.
+
+Plugin
+
+* Added a suggestion to fix `NotAModuleError`.
+
+* Removed __new__ override to prevent construction of "not usable"
+  implementations. This feature has never been observed/utilized in the wild
+  and it's removal simplifies tool interactions and use complexity.
+
+Miscellaneous
+
+* Removed CODE_OF_CONDUCT file. This is not something that we can enforce
+  at this time so it will be removed.
+
+* Added SMQTK-Descriptors to the ``README.md`` package list and graphic.
+
+* Added script to help with updating versioning and updating changelog during
+  the release process.
+
+* Updated README to include reference to the SMQTK-IQR package.
+
+* Periodic update of pinned dependency versions in lock file.
+
+* Added missing assert failure message to configuration test helper.
+
+* Added properties file for use with SonarQube and SonarCloud.
+
+Fixes
+-----

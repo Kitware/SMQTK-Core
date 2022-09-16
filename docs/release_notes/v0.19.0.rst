@@ -1,5 +1,24 @@
 v0.19.0
 =======
+This minor update brings in a number of repository updates, deprecates python
+3.6 support, and deprecates the `__new__` override in the `Pluggable` mixin
+interface to make it easier to use under real-world conditions.
+
+Most repository updates have revolved around stream lining the mechanics going
+into creating and publishing releases.
+
+The override of `__new__` provided functionality that, from experience and
+observation, was never actually made use of or added any actual security to
+anything. This feature came at the cost of interrupting some downstream tools
+(e.g. in ipython when inspecting a class with the ?-suffix) and adding
+complexity in how Pluggable needed to be used in defining interfaces (multiple
+inheritance and mixin UX). With the feature not being used, these costs don't
+make any sense any more. Thus, this override was removed for simplicity. Now,
+"not usable" implementations may be manually constructed if the user really
+desires to, under the presumption that manual construction implies manual
+consent. The `is_usable()` class method of course still exists and super-logic
+may continue to make use of it in relation to use-prevention or use-warning
+logic.
 
 Updates / New Features
 ----------------------
@@ -8,7 +27,7 @@ CI
 
 * Reverted previous release automation due to unintended side-effects.
   Created a revised publish action to more simply publish the package to pypi,
-  guarding against activating on fork of the repository.
+  guarding against activating on forks of the repository.
   This workflow has been made to be reusable by other repositories' workflows.
 
 * Modified CI unittests workflow to run for PRs targeting branches that match

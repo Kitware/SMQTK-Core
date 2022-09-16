@@ -19,6 +19,8 @@ CI
 
 * Reduced CodeCov report submission by skipping this step on scheduled runs.
 
+* Update code-cov action usage to use v3.
+
 Contribution Guide
 
 * Added instructions to update pending release when making a contribution.

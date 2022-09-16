@@ -41,6 +41,10 @@ Plugin
 
 * Added a suggestion to fix `NotAModuleError`.
 
+* Removed __new__ override to prevent construction of "not usable"
+  implementations. This feature has never been observed/utilized in the wild
+  and it's removal simplifies tool interactions and use complexity.
+
 Miscellaneous
 
 * Removed CODE_OF_CONDUCT file. This is not something that we can enforce

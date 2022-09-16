@@ -44,10 +44,12 @@ import logging
 import os
 import sys
 import types
-from typing import cast, Any, Collection, FrozenSet, Iterable, Set, Type, TypeVar
+from typing import cast, Collection, FrozenSet, Iterable, Set, Type, TypeVar
 
 # Before 3.8, we depend on importlib_metadata >=3.7.0, which is in parity with
 # the python version 3.10+ `importlib.metadata.entry_points`.
+# After 3.10, the method of accessing entrypoints is the same as when using the
+# importlib_metadata package.
 # This comparison IS NOT CHAINED on purpose to support mypy compatibility.
 # noinspection PyChainedComparisons
 if sys.version_info >= (3, 8) and sys.version_info < (3, 10):
@@ -56,7 +58,11 @@ if sys.version_info >= (3, 8) and sys.version_info < (3, 10):
     def get_ns_entrypoints(ns: str) -> Iterable["metadata.EntryPoint"]:
         return metadata.entry_points().get(ns, ())
 else:
-    import importlib_metadata as metadata
+    if sys.version_info < (3, 8):
+        import importlib_metadata as metadata
+    else:
+        # must be >=3.10
+        import importlib.metadata as metadata
 
     def get_ns_entrypoints(ns: str) -> Iterable["metadata.EntryPoint"]:
         return metadata.entry_points(group=ns)  # lgtm [py/call/wrong-named-argument]
@@ -159,7 +165,7 @@ def _collect_types_in_module(module: types.ModuleType) -> Set[Type]:
 def discover_via_env_var(env_var: str) -> Set[Type]:
     """
     Discover and return types specified in python-importable modules
-    specified in the the given environment variable.
+    specified in the given environment variable.
 
     We expect the given environment variable to define zero or more python
     module paths from which to yield all contained type definitions (i.e.
@@ -268,10 +274,19 @@ def discover_via_entrypoint_extensions(entrypoint_ns: str) -> Set[Type]:
     for entry_point in get_ns_entrypoints(entrypoint_ns):
         m = entry_point.load()
         if not isinstance(m, types.ModuleType):
+            # Type ignoring here has to do with mypy in py3.7 not recognizing
+            # these attributes, which are indeed valid, as existing in the
+            # EntryPoint namedtuple.
+            ep_name = entry_point.name  # type: ignore[attr-defined]
+            ep_val = entry_point.value  # type: ignore[attr-defined]
             raise NotAModuleError(
-                f"An entrypoint with key '{entry_point.name}' and value "
-                f"'{entry_point.value}' did not specify a module (got an "
-                f"object of type `{type(m).__name__}` instead): {m}"
+                f"An entrypoint with key '{ep_name}' and value "
+                f"'{ep_val}' did not specify a module (got an "
+                f"object of type `{type(m).__name__}` instead): {m}\n"
+                "A common cause for the issue is using an unsupported "
+                "entrypoint specification along the lines of "
+                "`foo = package.module:class`. Please change it to "
+                "`foo = package.module` to fix the issue."
             )
         else:
             type_set.update(_collect_types_in_module(m))
@@ -295,7 +310,7 @@ def discover_via_subclasses(interface_type: Type) -> Set[Type]:
     depending on the import state at the time of invocation. E.g. further
     imports may increase the quantity of returns from this function.
 
-    This function uses depth-first-search when traversing sub-class tree.
+    This function uses depth-first-search when traversing subclass tree.
 
     Reference:
       https://docs.python.org/3/library/stdtypes.html#class.__subclasses__
@@ -306,7 +321,7 @@ def discover_via_subclasses(interface_type: Type) -> Set[Type]:
           gc.collect()` wipes out the return as long as it's not referenced, of
           course as long as its reference is not retained by something.
 
-    :param interface_type: The interface type to recursively find sub-classes
+    :param interface_type: The interface type to recursively find subclasses
         under.
     :return: Set of recursive subclass types under `interface_type`.
     """
@@ -316,7 +331,7 @@ def discover_via_subclasses(interface_type: Type) -> Set[Type]:
 
     # Use a list (stack behavior) to track the descendant classes of
     # `interface_type`. Depth- vs. Breadth-first search should not matter here,
-    # so just using just using lists here for theoretically more optimal array
+    # so just using lists here for theoretically more optimal array
     # caching.
     candidates = interface_type.__subclasses__()
     while candidates:
@@ -349,33 +364,9 @@ def filter_plugin_types(
     return {cls for cls in candidate_pool if is_valid_plugin(cls, interface_type)}
 
 
-class NotUsableError(Exception):
-    """
-    Exception thrown when a pluggable class is constructed but does not report
-    as usable.
-    """
-
-
 class Pluggable(metaclass=abc.ABCMeta):
     """
     Interface for classes that have plugin implementations.
-
-    This mixin class adds an assertive check during instance construction that
-    the derived type is "usable" by invoking its `is_usable()` class-method
-    within this type's `__new__` method.
-    This is happening in `__new__` specifically for a couple reasons:
-
-        * Sub-classes do not have to explicitly invoke super to inherit this
-          safety functionality.
-
-        * Unblocks certain type-checking situations involving multiple
-          inheritance and behavior as a mixin.
-
-    **NOTE:** In a multiple inheritance scenario with another type that also
-    implements `__new__`, this class should be listed to the right-hand-side
-    so as to be later in the MRO. Otherwise, this will cut off arguments from
-    being sent to the super `__new__` as we simply consider the locally parent
-    type of `object` when calling our `super().__new__`.
     """
 
     __slots__ = ()
@@ -398,7 +389,7 @@ class Pluggable(metaclass=abc.ABCMeta):
 
         :return: Set of discovered class types that are considered "valid"
             plugins of this type. See :py:func:`is_valid_plugin` for what we
-            define a "valid" type to be be relative to this class.
+            define a "valid" type to be relative to this class.
 
         """
         candidate_types = {
@@ -424,7 +415,7 @@ class Pluggable(metaclass=abc.ABCMeta):
         usable. When this method returns `True`, the class is declaring that it
         should be constructable and usable in the current environment.
 
-        By default, this method will return True unless a sub-class overrides
+        By default, this method will return True unless a subclass overrides
         this class-method with their specific logic.
 
         NOTES:
@@ -439,18 +430,3 @@ class Pluggable(metaclass=abc.ABCMeta):
 
         """
         return True
-
-    def __new__(cls: Type[P], *args: Any, **kwargs: Any) -> P:
-        # This needs to take in *args/**kwargs as a basic (not-new-overriding)
-        # subclass scenario will see its constructor args passed here.
-        # Requiring all inheriting classes to define a __new__ for parameter
-        # translation is unacceptable.
-        if not cls.is_usable():
-            raise NotUsableError(
-                "Implementation class '%s' is not currently "
-                "usable." % cls.__name__
-            )
-        # If we're used in multiple inheritance, pass along inputs, otherwise
-        # we'll receive a TypeError from `object.__new__` which does not take
-        # any parameters besides `cls`.
-        return super().__new__(cls)

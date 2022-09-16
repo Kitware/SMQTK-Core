@@ -11,6 +11,7 @@ on:
   pull_request:
     branches:
       - master
+      - release*
   schedule:
     # Nightly run unit tests to check for implicit dependency issues between pull requests.
     - cron: '0 0 * * *'
@@ -24,7 +25,7 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
-    container: python:3.6
+    container: python:3.7
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
@@ -42,9 +43,9 @@ jobs:
             ~/.cache/pip
             ~/.cache/pypoetry/virtualenvs/
             ~/.local
-          key: python-3.6-${{ hashFiles('poetry.lock') }}
+          key: python-3.7-${{ hashFiles('poetry.lock') }}
           restore-keys: |
-            python-3.6-
+            python-3.7-
       - name: Setup Environment
         uses: ./.github/actions/python-poetry-setup
       - name: Lint with Flake8
@@ -52,7 +53,7 @@ jobs:
 
   typecheck:
     runs-on: ubuntu-latest
-    container: python:3.6
+    container: python:3.7
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
@@ -70,22 +71,25 @@ jobs:
             ~/.cache/pip
             ~/.cache/pypoetry/virtualenvs/
             ~/.local
-          key: python-3.6-${{ hashFiles('poetry.lock') }}
+          key: python-3.7-${{ hashFiles('poetry.lock') }}
           restore-keys: |
-            python-3.6-
+            python-3.7-
       - name: Setup Environment
         uses: ./.github/actions/python-poetry-setup
       - name: Typecheck with MyPy
         run: poetry run mypy
 
-  # This workflow contains a single job called "build"
   pytest:
     # Running in containers, so this unknown environment is fine.
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        python-version: [3.6, 3.7, 3.8, 3.9]
+        python-version: ["3.7", "3.8", "3.9", "3.10"]
+        # Extras for included, optional plugin support (space-separated lists)
+        opt-extra: [
+            "",  # no extras
+        ]
       # We want all python versions tested even if one of them happens to fail
       fail-fast: false
 
@@ -119,11 +123,21 @@ jobs:
       - name: Setup Environment
         uses: ./.github/actions/python-poetry-setup
 
+      - name: Optionally install additional requirements
+        env:
+          OPT_EXTRA: ${{ matrix.opt-extra }}
+        run: |
+          if [[ -n "$OPT_EXTRA" ]]
+          then
+            poetry install --extras "$OPT_EXTRA"
+          fi
+
       - name: Run Unittests
         run: poetry run pytest
 
       - name: CodeCov report submission
-        uses: codecov/codecov-action@v1
+        if: ${{ github.event_name != 'schedule' }}
+        uses: codecov/codecov-action@v3
         with:
           fail_ci_if_error: true
           files: coverage.xml

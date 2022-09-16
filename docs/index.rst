@@ -47,6 +47,7 @@ synergistically.
    review_process
    releasing
    faq
+   miscellaneous
 
 
 Indices and tables

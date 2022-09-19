@@ -19,8 +19,12 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+defaults:
+  run:
+    shell: bash
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
-# NOTE: Github actions does not support anchors apparently. Forgive duplication of job
+# NOTE: GitHub actions does not support anchors, apparently. Forgive duplication of job
 #       steps.
 jobs:
   lint:
@@ -40,12 +44,9 @@ jobs:
           # `pip install --user` is invoked below, so we can be confident that
           # only our python stuff is being captured in this cache (intentional).
           path: |
-            ~/.cache/pip
             ~/.cache/pypoetry/virtualenvs/
             ~/.local
-          key: python-3.7-${{ hashFiles('poetry.lock') }}
-          restore-keys: |
-            python-3.7-
+          key: python-3.7-${{ hashFiles('poetry.lock') }}-
       - name: Setup Environment
         uses: ./.github/actions/python-poetry-setup
       - name: Lint with Flake8
@@ -68,10 +69,9 @@ jobs:
           # `pip install --user` is invoked below, so we can be confident that
           # only our python stuff is being captured in this cache (intentional).
           path: |
-            ~/.cache/pip
             ~/.cache/pypoetry/virtualenvs/
             ~/.local
-          key: python-3.7-${{ hashFiles('poetry.lock') }}
+          key: python-3.7-${{ hashFiles('poetry.lock') }}-
           restore-keys: |
             python-3.7-
       - name: Setup Environment
@@ -113,12 +113,9 @@ jobs:
           # `pip install --user` is invoked below, so we can be confident that
           # only our python stuff is being captured in this cache (intentional).
           path: |
-            ~/.cache/pip
             ~/.cache/pypoetry/virtualenvs/
             ~/.local
-          key: python-${{ matrix.python-version }}-${{ hashFiles('poetry.lock') }}
-          restore-keys: |
-            python-${{ matrix.python-version }}-
+          key: python-${{ matrix.python-version }}-${{ hashFiles('poetry.lock') }}-${{ matrix.opt-extra }}
 
       - name: Setup Environment
         uses: ./.github/actions/python-poetry-setup

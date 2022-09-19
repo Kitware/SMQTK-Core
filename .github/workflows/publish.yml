@@ -23,14 +23,19 @@ defaults:
 #       steps.
 jobs:
   publish:
+    # Running in containers, so this unknown environment is fine.
     runs-on: ubuntu-latest
+
     container: python:3.7
+
     if: github.repository_owner == 'Kitware'
+
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
+
       # Cache local python environment artifacts for the current python version
       # and poetry lockfile hash.
       - uses: actions/cache@v2
@@ -40,12 +45,9 @@ jobs:
           # `pip install --user` is invoked below, so we can be confident that
           # only our python stuff is being captured in this cache (intentional).
           path: |
-            ~/.cache/pip
             ~/.cache/pypoetry/virtualenvs/
             ~/.local
-          key: python-3.7-${{ hashFiles('poetry.lock') }}
-          restore-keys: |
-            python-3.7-
+          key: python-3.7-${{ hashFiles('poetry.lock') }}-
 
       - name: Setup Environment
         # Using non-relative path for correct behavior when used as a remote

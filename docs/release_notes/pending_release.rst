@@ -14,5 +14,7 @@ CI
 
 * Added explicit provision of codecov repository token to github action.
 
+* Add testing for py3.11.
+
 Fixes
 -----

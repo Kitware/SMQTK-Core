@@ -1,5 +1,7 @@
 v0.18.2
 =======
+This patch release updates some aspects of the CI workflow and documentation,
+notably the automated package publishing upon appropriate tag pushing.
 
 Updates / New Features
 ----------------------

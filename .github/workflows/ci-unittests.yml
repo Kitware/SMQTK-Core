@@ -85,7 +85,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10"]
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
         # Extras for included, optional plugin support (space-separated lists)
         opt-extra: [
             "",  # no extras

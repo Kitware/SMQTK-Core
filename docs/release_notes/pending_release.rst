@@ -9,5 +9,8 @@ CI
 * Synchronize workflow files with other smqtk repositories so they share their
   format and parameterization more similarly.
 
+* Add configuration for codecov to required different coverage percentage for
+  the package source vs. the tests.
+
 Fixes
 -----

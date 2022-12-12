@@ -11,5 +11,12 @@ coverage:
         paths:
           - "!tests/"
     patch:
-      default:
+      default: false
+      tests:
+        target: 100%
+        paths:
+          - "tests/"
+      package:
         target: 80%
+        paths:
+          - "!tests/"

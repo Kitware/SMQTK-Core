@@ -93,7 +93,7 @@ class TestIsValidPlugin:
         class ImplementsPropOnly(InterfaceType):
             # Lingering abstract method
             @property
-            def abs_prop(self) -> int: ...
+            def abs_prop(self) -> int: ...  # type: ignore[empty-body]
 
         assert not is_valid_plugin(ImplementsMethodOnly, InterfaceType)
         assert not is_valid_plugin(ImplementsPropOnly, InterfaceType)
@@ -133,7 +133,7 @@ class TestIsValidPlugin:
 
         class ImplementingType(InterfaceType):
             # is_usable default is True
-            def feature(self) -> int: ...
+            def feature(self) -> int: ...  # type: ignore[empty-body]
 
         assert is_valid_plugin(ImplementingType, InterfaceType)
 

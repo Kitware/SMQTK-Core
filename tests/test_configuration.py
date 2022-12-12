@@ -303,7 +303,7 @@ def test_to_config_dict_given_type() -> None:
     # New sub-class implementing Configurable, but passed as the type not an
     # instance.
     class SomeConfigurableType (Configurable):
-        def get_config(self) -> Dict[str, Any]: ...
+        def get_config(self) -> Dict[str, Any]: ...  # type: ignore[empty-body]
 
     with pytest.raises(ValueError):
         # noinspection PyTypeChecker

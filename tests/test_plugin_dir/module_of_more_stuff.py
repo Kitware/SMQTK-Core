@@ -9,7 +9,7 @@ class NewCustomType(argparse.ArgumentParser):
 
 
 class AnotherDerived(module_of_stuff.ClassDefinition):
-    def cool_thing(self) -> str:
+    def cool_thing(self) -> str:  # type: ignore[empty-body]
         """ Some implementation, content doesn't matter. """
 
 

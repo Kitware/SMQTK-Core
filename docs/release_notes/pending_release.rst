@@ -12,5 +12,7 @@ CI
 * Add configuration for codecov to required different coverage percentage for
   the package source vs. the tests.
 
+* Added explicit provision of codecov repository token to github action.
+
 Fixes
 -----

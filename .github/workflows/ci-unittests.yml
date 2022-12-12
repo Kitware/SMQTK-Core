@@ -136,6 +136,7 @@ jobs:
         if: ${{ github.event_name != 'schedule' }}
         uses: codecov/codecov-action@v3
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true
           files: coverage.xml
           flags: unittests

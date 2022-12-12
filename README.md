@@ -32,6 +32,9 @@ Some above-mentioned packages supporting AI/ML topics include the following:
 * [SMQTK-Classifier] provides
   interfaces and implementations around black-box classification.
 
+* [SMQTK-Detection] provides interfaces and support for black-box object
+  detection.
+
 * [SMQTK-Indexing] provides
   interfaces and implementations for efficient, large-scale indexing of
   descriptor vectors.
@@ -47,7 +50,14 @@ Some above-mentioned packages supporting AI/ML topics include the following:
   This is a primary component for Interactive Query Refinement (IQR) systems
   that makes use of human feedback.
 
-These packages are related as followed:
+* [SMQTK-IQR] provides classes and utilities to perform the Interactive Query
+  Refinement (IQR) process. This package also includes a web API exposing the
+  use of these tools as well as an example web UI service to demonstrate the
+  capability. These services are additionally containerized to provide some
+  portability of these services.
+
+These packages are related as follows:
+
 ![Dependency Graph](docs/images/dep_block.svg)
 
 ## This looks a lot like KWIVER! Why use this instead?
@@ -107,5 +117,7 @@ firefox _build/html/index.html
 [SMQTK-Image-IO]: https://github.com/Kitware/SMQTK-Image-IO
 [SMQTK-Descriptors]: https://github.com/Kitware/SMQTK-Descriptors
 [SMQTK-Classifier]: https://github.com/Kitware/SMQTK-Classifier
+[SMQTK-Detection]: https://github.com/Kitware/SMQTK-Detection
 [SMQTK-Indexing]: https://github.com/Kitware/SMQTK-Indexing
 [SMQTK-Relevancy]: https://github.com/Kitware/SMQTK-Relevancy
+[SMQTK-IQR]: https://github.com/Kitware/SMQTK-IQR

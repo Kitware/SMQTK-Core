@@ -271,7 +271,11 @@ def discover_via_entrypoint_extensions(entrypoint_ns: str) -> Set[Type]:
             raise NotAModuleError(
                 f"An entrypoint with key '{entry_point.name}' and value "
                 f"'{entry_point.value}' did not specify a module (got an "
-                f"object of type `{type(m).__name__}` instead): {m}"
+                f"object of type `{type(m).__name__}` instead): {m}\n"
+                "A common cause for the issue is using an unsupported "
+                "entrypoint specification along the lines of "
+                "`foo = package.module:class`. Please change it to "
+                "`foo = package.module` to fix the issue."
             )
         else:
             type_set.update(_collect_types_in_module(m))

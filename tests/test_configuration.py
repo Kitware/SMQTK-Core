@@ -10,6 +10,7 @@ from smqtk_core.configuration import (
     make_default_config,
     to_config_dict,
     from_config_dict,
+    configuration_test_helper,
 )
 
 
@@ -497,3 +498,32 @@ def test_from_config_dict_assertion_error() -> None:
                        match="Configured class type 'NotConfigurable' does not "
                              r"descend from `Configurable`\."):
         from_config_dict(test_config, test_class_set)  # type: ignore
+
+
+def test_configuration_test_helper_dflt_config_key_mismatch() -> None:
+    """
+    Test that the assertion is raised when the default and instance
+    configuration objects returned don't have the same set of keys.
+    """
+    class TestConfigurable (Configurable):
+        @classmethod
+        def get_default_config(cls) -> Dict[str, Any]:
+            return {
+                'a': 0,
+                'b': 1,
+                'c': 2,
+            }
+
+        def __init__(self, a: int = 0, b: int = 1, c: int = 2): ...
+
+        def get_config(self) -> Dict[str, Any]:
+            return {
+                'a': 0,
+                'b': 1,
+            }
+
+    inst = TestConfigurable()
+    with pytest.raises(AssertionError,
+                       match=r"Input configuration and `get_config` output "
+                             r"keys are not congruent"):
+        configuration_test_helper(inst)

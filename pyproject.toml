@@ -37,22 +37,35 @@ importlib-metadata = {version = ">=1.4", python = "<3.8"}
 
 [tool.poetry.dev-dependencies]
 # CI
-flake8 = "*"
-flake8-mutable = "*"
-mypy = "*"
+flake8 = [
+    # Hinge because 6.0 minimum supported python version is 3.8.1
+    { version = ">=5", python = "<3.8.1" },
+    { version = ">=6", python = ">=3.8.1" }
+]
+flake8-mutable = ">=1.2"
+mypy = ">=0.991"
 # Docs
 # - Also see: `docs/readthedocs-reqs.txt` for use by RTD
-Sphinx = "*"
-sphinx-rtd-theme = "*"
-sphinx-argparse = "*"
-sphinx-prompt = "*"
-livereload = "*"
+Sphinx = [
+    # Hinge because, while sphinx >=5.3 supports python <3.8.1, it requires an
+    # importlib-metadata version higher than what flake8 ^5 supports, which is
+    # the version of flake8 required for python version <3.8.1.
+    { version = ">=4.3.2", python = "<3.8.1" },
+    { version = ">=5.3", python = ">=3.8.1"}
+]
+sphinx-rtd-theme = ">=1.1.1"
+sphinx-argparse = ">=0.4"
+sphinx-prompt = ">=1.5"
+livereload = ">=2.6.3"
 # Testing
-coverage = "*"
-pytest = "*"
-pytest-cov = "*"
+coverage = ">=6.5"
+pytest = ">=7.2"
+pytest-cov = ">=4"
 # Development
-ipython = "*"
+ipython = [
+    { version = ">=7.34.0", python = "<3.8" },
+    { version = ">=8.6.0", python = ">=3.8" }
+]
 
 ###############################################################################
 [tool.pytest.ini_options]

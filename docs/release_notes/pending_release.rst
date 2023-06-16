@@ -16,5 +16,9 @@ CI
 
 * Add testing for py3.11.
 
+* Update publish automation to make use of py3.8 and updates a check to ensure
+  the git ref_name that triggered the workflow matches the package version to
+  be published.
+
 Fixes
 -----

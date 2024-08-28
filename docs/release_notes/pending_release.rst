@@ -22,3 +22,8 @@ CI
 
 Fixes
 -----
+
+Changes
+-------
+
+* Modified installation docs

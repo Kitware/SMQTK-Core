@@ -133,9 +133,9 @@ It will likely be desirable to utilize both the :class:`.Pluggable` and
 :class:`.Configurable` mixins when constructing your own new interfaces.
 To facilitate this, and to reduce excessive typing, we provide the
 :class:`.Plugfigurable` helper class.
-This class does not add or change any functionality.
-It is merely a convenience to indicate the multiply inherit from both mixin
+It is mostly a convenience the multiply inherit from both mixin
 types.
+It also can be used seamlessly with `Pydantic <https://pydantic.dev/>`__.
 Also regarding multiple in inheritance, either :class:`.Pluggable' nor
 :class:`.Configurable` define a `__init__` method, so
 
@@ -511,12 +511,34 @@ function, we get a fully constructed instance:
 
     >>> from smqtk_core.configuration import from_config_dict
     >>> # Let's modify the config away from default values.
+    >>> cfg_dict['type'] = '__main__.MyImplementation'
     >>> cfg_dict['__main__.MyImplementation'] = {'paramA': 77, 'paramB': 444}
     >>> inst = from_config_dict(cfg_dict, MyInterface.get_impls())
     >>> assert inst.a == 77
     >>> assert inst.b == 444
 
 See the method documentation for additional details.
+
+Usage with Pydantic
+'''''''''''''''''''
+
+Since the :class:`.Plugfigurable` class combines the native JSON representation,
+as well as methods to convert to and from it,
+with the automatic implementation discovery,
+it can be seamlessly used with `Pydantic <https://pydantic.dev/>`__:
+
+.. code-block:: python
+
+    >>> import pydantic
+    >>> ta = pydantic.TypeAdapter(MyInterface)
+    >>> inst = ta.validate_python(cfg_dict)
+    >>> assert inst.a == 77
+    >>> assert inst.b == 444
+    >>> ta.dump_python(inst)
+    {
+        "type": "__main__.MyImplementation",
+        "__main__.MyImplementation": {"paramA": 77, "paramB": 444}
+    }
 
 Help with writing unit tests for Configurable-implementing types
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

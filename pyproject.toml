@@ -36,6 +36,7 @@ python = "^3.7"
 importlib-metadata = {version = ">=1.4", python = "<3.8"}
 
 [tool.poetry.dev-dependencies]
+pydantic = ">=2, <3"
 # CI
 flake8 = [
     # Hinge because 6.0 minimum supported python version is 3.8.1

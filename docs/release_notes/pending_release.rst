@@ -23,5 +23,7 @@ CI
 * Updated ``readthedocs.yml`` to using the ``poetry`` install command to
   install the package and its dependencies.
 
+* Updated GitHub actions to use the latest versions of actions.
+
 Fixes
 -----

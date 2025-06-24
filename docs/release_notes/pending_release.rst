@@ -25,5 +25,7 @@ CI
 
 * Updated GitHub actions to use the latest versions of actions.
 
+* Updated GitHub ``poetry`` install action to constrain to ``poetry<2.0``.
+
 Fixes
 -----

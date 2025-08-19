@@ -1,36 +1,38 @@
 v0.20.0
 =======
 
+This release updates CI and tooling across the board: workflow files were
+standardized across repositories, Codecov integration was improved
+(including better fork PR support and stricter configuration), and GitHub
+Actions were modernized with the latest actions and refined Poetry usage.
+Documentation builds now use Poetry as well. Finally, Python version support
+was updated to require 3.10+ and extend testing through 3.13.
+
 Updates / New Features
 ----------------------
 
-CI
+CI / Tooling
 
-* Synchronize workflow files with other smqtk repositories so they share their
-  format and parameterization more similarly.
+* Synchronized workflow files with other smqtk repositories for consistent
+format and parameterization.
 
-* Add configuration for codecov to required different coverage percentage for
-  the package source vs. the tests.
+* Improved Codecov integration:
+  - Added support for coverage reporting on pull requests from forks
+    (unprotected branches).
+  - Added explicit provision of the codecov repository token to the GitHub
+    action.
+  - Updated the ``codecov.yml`` file to include a ``strict_yaml_branch``
+    setting for better branch management.
 
-* Added explicit provision of codecov repository token to github action.
+* Updated GitHub Actions:
+  - Updated to use the latest versions of actions.
+  - Updated the ``poetry`` install action to constrain to ``poetry<2.0``.
+  - Updated the ``readthedocs.yml`` file to use the ``poetry`` install
+    command for package and dependency installation.
 
-* Add testing for py3.11 and py3.12.
-
-* Update publish automation to make use of py3.8 and updates a check to ensure
-  the git ref_name that triggered the workflow matches the package version to
-  be published.
-
-* Updated ``readthedocs.yml`` to using the ``poetry`` install command to
-  install the package and its dependencies.
-
-* Updated GitHub actions to use the latest versions of actions.
-
-* Updated GitHub ``poetry`` install action to constrain to ``poetry<2.0``.
-
-* Updated minimum supported Python version to ``>=3.10``.
-
-* Updated tested Python versions to ``3.10–3.13``.
+* Updated supported Python versions:
+  - Minimum supported Python version updated to ``>=3.10``.
+  - Tested Python versions updated to ``3.10–3.13``.
 
 Fixes
 -----
-* Codecov integration to support coverage reporting on pull requests from forks (unprotected branches).

@@ -132,15 +132,14 @@ jobs:
       - name: Run Unittests
         run: poetry run pytest
 
-      # Keep Codecov upload for trusted runs only (push or same-repo PR)
       - name: CodeCov report submission
         if: github.event_name != 'schedule' &&
-            (github.event_name == 'push' ||
-             (github.event_name == 'pull_request' &&
-              github.event.pull_request.head.repo.full_name == github.repository))
-        uses: codecov/codecov-action@v5
+        (github.event_name == 'push' ||
+        (github.event_name == 'pull_request' &&
+          github.event.pull_request.head.repo.full_name == github.repository))
+        uses: codecov/codecov-action@v3
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}   # optional on public, avoids rate limits
+          token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true
           files: coverage.xml
           flags: unittests

@@ -26,7 +26,7 @@ jobs:
     # Running in containers, so this unknown environment is fine.
     runs-on: ubuntu-latest
 
-    container: python:3.8
+    container: python:3.10
 
     if: github.repository_owner == 'Kitware'
 
@@ -47,7 +47,7 @@ jobs:
           path: |
             ~/.cache/pypoetry/virtualenvs/
             ~/.local
-          key: python-3.8-${{ hashFiles('poetry.lock') }}
+          key: python-3.10-${{ hashFiles('poetry.lock') }}
 
       - name: Setup Environment
         # Using non-relative path for correct behavior when used as a remote

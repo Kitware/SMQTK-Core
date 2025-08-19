@@ -132,11 +132,20 @@ jobs:
       - name: Run Unittests
         run: poetry run pytest
 
-      - name: CodeCov report submission
-        if: ${{ github.event_name != 'schedule' && (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository) }}
-        uses: codecov/codecov-action@v5
+      - name: Upload coverage artifact (PRs)
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          fail_ci_if_error: true
-          files: coverage.xml
-          flags: unittests
+          name: coverage-${{ github.run_id }}-${{ matrix.python-version }}
+          path: coverage.xml
+          if-no-files-found: ignore
+          retention-days: 7
+
+      # - name: CodeCov report submission
+      #   if: ${{ github.event_name != 'schedule' && (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository) }}
+      #   uses: codecov/codecov-action@v5
+      #   with:
+      #     token: ${{ secrets.CODECOV_TOKEN }}
+      #     fail_ci_if_error: true
+      #     files: coverage.xml
+      #     flags: unittests

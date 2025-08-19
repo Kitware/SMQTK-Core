@@ -6,7 +6,7 @@ runs:
     - name: Install Poetry
       run: |
         echo "${HOME}/.local/bin" >> $GITHUB_PATH
-        pip install --user -U poetry
+        pip install --root-user-action=ignore --user -U "poetry<2.0" -q
       shell: bash
     - name: Versions of things used here
       run: |

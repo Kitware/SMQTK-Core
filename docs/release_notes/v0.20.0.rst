@@ -1,0 +1,38 @@
+v0.20.0
+=======
+
+This release updates CI and tooling across the board: workflow files were
+standardized across repositories, Codecov integration was improved
+(including better fork PR support and stricter configuration), and GitHub
+Actions were modernized with the latest actions and refined Poetry usage.
+Documentation builds now use Poetry as well. Finally, Python version support
+was updated to require 3.10+ and extend testing through 3.13.
+
+Updates / New Features
+----------------------
+
+CI / Tooling
+
+* Synchronized workflow files with other smqtk repositories for consistent
+format and parameterization.
+
+* Improved Codecov integration:
+  - Added support for coverage reporting on pull requests from forks
+    (unprotected branches).
+  - Added explicit provision of the codecov repository token to the GitHub
+    action.
+  - Updated the ``codecov.yml`` file to include a ``strict_yaml_branch``
+    setting for better branch management.
+
+* Updated GitHub Actions:
+  - Updated to use the latest versions of actions.
+  - Updated the ``poetry`` install action to constrain to ``poetry<2.0``.
+  - Updated the ``readthedocs.yml`` file to use the ``poetry`` install
+    command for package and dependency installation.
+
+* Updated supported Python versions:
+  - Minimum supported Python version updated to ``>=3.10``.
+  - Tested Python versions updated to ``3.10–3.13``.
+
+Fixes
+-----

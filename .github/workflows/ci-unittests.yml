@@ -19,33 +19,34 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+defaults:
+  run:
+    shell: bash
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
-# NOTE: Github actions does not support anchors apparently. Forgive duplication of job
+# NOTE: GitHub actions does not support anchors, apparently. Forgive duplication of job
 #       steps.
 jobs:
   lint:
     runs-on: ubuntu-latest
-    container: python:3.7
+    container: python:3.10
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       # Cache local python environment artifacts for the current python version
       # and poetry lockfile hash.
-      - uses: actions/cache@v2
+      - uses: actions/cache@v4
         id: env-cache
         with:
           # Confirmed that the `.local` directory doesn't exist until the
           # `pip install --user` is invoked below, so we can be confident that
           # only our python stuff is being captured in this cache (intentional).
           path: |
-            ~/.cache/pip
             ~/.cache/pypoetry/virtualenvs/
             ~/.local
-          key: python-3.7-${{ hashFiles('poetry.lock') }}
-          restore-keys: |
-            python-3.7-
+          key: python-3.10-${{ hashFiles('poetry.lock') }}-
       - name: Setup Environment
         uses: ./.github/actions/python-poetry-setup
       - name: Lint with Flake8
@@ -53,27 +54,26 @@ jobs:
 
   typecheck:
     runs-on: ubuntu-latest
-    container: python:3.7
+    container: python:3.10
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       # Cache local python environment artifacts for the current python version
       # and poetry lockfile hash.
-      - uses: actions/cache@v2
+      - uses: actions/cache@v4
         id: env-cache
         with:
           # Confirmed that the `.local` directory doesn't exist until the
           # `pip install --user` is invoked below, so we can be confident that
           # only our python stuff is being captured in this cache (intentional).
           path: |
-            ~/.cache/pip
             ~/.cache/pypoetry/virtualenvs/
             ~/.local
-          key: python-3.7-${{ hashFiles('poetry.lock') }}
+          key: python-3.10-${{ hashFiles('poetry.lock') }}-
           restore-keys: |
-            python-3.7-
+            python-3.10-
       - name: Setup Environment
         uses: ./.github/actions/python-poetry-setup
       - name: Typecheck with MyPy
@@ -85,7 +85,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10"]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
         # Extras for included, optional plugin support (space-separated lists)
         opt-extra: [
             "",  # no extras
@@ -98,7 +98,7 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -106,19 +106,16 @@ jobs:
       # and poetry lockfile hash.
       # Caching occurs on a successfully completing job (e.g. after running
       # pytest in this job's case).
-      - uses: actions/cache@v2
+      - uses: actions/cache@v4
         id: env-cache
         with:
           # Confirmed that the `.local` directory doesn't exist until the
           # `pip install --user` is invoked below, so we can be confident that
           # only our python stuff is being captured in this cache (intentional).
           path: |
-            ~/.cache/pip
             ~/.cache/pypoetry/virtualenvs/
             ~/.local
-          key: python-${{ matrix.python-version }}-${{ hashFiles('poetry.lock') }}
-          restore-keys: |
-            python-${{ matrix.python-version }}-
+          key: python-${{ matrix.python-version }}-${{ hashFiles('poetry.lock') }}-${{ matrix.opt-extra }}
 
       - name: Setup Environment
         uses: ./.github/actions/python-poetry-setup
@@ -135,10 +132,11 @@ jobs:
       - name: Run Unittests
         run: poetry run pytest
 
-      - name: CodeCov report submission
-        if: ${{ github.event_name != 'schedule' }}
-        uses: codecov/codecov-action@v3
+      - name: Codecov report submission
+        if: github.event_name != 'schedule'
+        uses: codecov/codecov-action@v5
         with:
+          token: ${{ secrets.CODECOV_TOKEN || '' }}
           fail_ci_if_error: true
           files: coverage.xml
           flags: unittests

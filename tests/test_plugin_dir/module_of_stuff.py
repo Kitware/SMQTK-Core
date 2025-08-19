@@ -16,7 +16,7 @@ class ClassDefinition(metaclass=abc.ABCMeta):
 
 class Derived(ClassDefinition):
 
-    def cool_thing(self) -> str:
+    def cool_thing(self) -> str:  # type: ignore[empty-body]
         """ Some implementation, content doesn't matter. """
 
 

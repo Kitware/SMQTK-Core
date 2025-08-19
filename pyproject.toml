@@ -1,5 +1,5 @@
 [build-system]
-requires = ["poetry-core>=1.0.0"]
+requires = ["poetry-core>=1.2.0"]
 build-backend = "poetry.core.masonry.api"
 
 ###############################################################################
@@ -8,7 +8,7 @@ name = "smqtk-core"
 # REMEMBER: `distutils.version.*Version` types can be used to compare versions
 # from strings like this.
 # SMQTK prefers to use the strict numbering standard when possible.
-version = "0.19.0"
+version = "0.20.0"
 description = """\
     Python toolkit for pluggable algorithms and data structures for \
     multimedia-based machine learning."""
@@ -25,34 +25,33 @@ classifiers = [
         'Operating System :: MacOS :: MacOS X',
         'Operating System :: Unix',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
-        'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
+        'Programming Language :: Python :: 3.13',
 ]
 
 [tool.poetry.dependencies]
-python = "^3.7"
-importlib-metadata = {version = ">=1.4", python = "<3.8"}
+python = "^3.10"
 
 [tool.poetry.dev-dependencies]
 # CI
-flake8 = "*"
-flake8-mutable = "*"
-mypy = "*"
+flake8 = ">=6"
+flake8-mutable = ">=1.2"
+mypy = ">=0.991"
 # Docs
 # - Also see: `docs/readthedocs-reqs.txt` for use by RTD
-Sphinx = "*"
-sphinx-rtd-theme = "*"
-sphinx-argparse = "*"
-sphinx-prompt = "*"
-livereload = "*"
+Sphinx = ">=5.3"
+sphinx-rtd-theme = ">=1.1.1"
+sphinx-argparse = ">=0.4"
+sphinx-prompt = ">=1.5"
+livereload = ">=2.6.3"
 # Testing
-coverage = "*"
-pytest = "*"
-pytest-cov = "*"
+coverage = ">=6.5"
+pytest = ">=7.2"
+pytest-cov = ">=4"
 # Development
-ipython = "*"
+ipython = ">=8.6.0"
 
 ###############################################################################
 [tool.pytest.ini_options]

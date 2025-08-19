@@ -132,11 +132,26 @@ jobs:
       - name: Run Unittests
         run: poetry run pytest
 
-      - name: CodeCov report submission
-        if: ${{ github.event_name != 'schedule' }}
-        uses: codecov/codecov-action@v3
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          fail_ci_if_error: true
-          files: coverage.xml
-          flags: unittests
+    # --- NEW: publish coverage artifact on PRs (forks included) ---
+      - name: Upload coverage artifact (PRs)
+      if: github.event_name == 'pull_request'
+      uses: actions/upload-artifact@v4
+      with:
+        # One artifact per matrix job so we can merge later
+        name: coverage-${{ github.run_id }}-${{ matrix.python-version }}
+        path: coverage.xml
+        if-no-files-found: ignore
+        retention-days: 7
+
+    # Keep Codecov upload for trusted runs only (push or same-repo PR)
+    - name: CodeCov report submission
+      if: github.event_name != 'schedule' &&
+          (github.event_name == 'push' ||
+          (github.event_name == 'pull_request' &&
+            github.event.pull_request.head.repo.full_name == github.repository))
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}   # optional on public, avoids rate limits
+        fail_ci_if_error: true
+        files: coverage.xml
+        flags: unittests

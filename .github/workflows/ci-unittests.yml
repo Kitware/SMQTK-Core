@@ -132,16 +132,16 @@ jobs:
       - name: Run Unittests
         run: poetry run pytest
 
-    # # --- NEW: publish coverage artifact on PRs (forks included) ---
-    #   - name: Upload coverage artifact (PRs)
-    #   if: github.event_name == 'pull_request'
-    #   uses: actions/upload-artifact@v4
-    #   with:
-    #     # One artifact per matrix job so we can merge later
-    #     name: coverage-${{ github.run_id }}-${{ matrix.python-version }}
-    #     path: coverage.xml
-    #     if-no-files-found: ignore
-    #     retention-days: 7
+    # publish coverage artifact on PRs (forks included)
+      - name: Upload coverage artifact (PRs)
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          # One artifact per matrix job so we can merge later
+          name: coverage-${{ github.run_id }}-${{ matrix.python-version }}
+          path: coverage.xml
+          if-no-files-found: ignore
+          retention-days: 7
 
     # # Keep Codecov upload for trusted runs only (push or same-repo PR)
     # - name: CodeCov report submission

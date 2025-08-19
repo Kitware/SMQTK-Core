@@ -1,0 +1,61 @@
+name: Upload Coverage (from PR artifacts)
+
+on:
+  workflow_run:
+    workflows: ["CI Unittests"]
+    types: [completed]
+
+permissions:
+  contents: read
+  actions: read
+  # uncomment if you switch to OIDC auth for Codecov:
+  # id-token: write
+
+jobs:
+  upload:
+    # Only for successful PR runs, and only in the base repo
+    if: >
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.repository.full_name == github.repository
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download all coverage artifacts from CI run
+        uses: dawidd6/action-download-artifact@v11
+        with:
+          # this is the run we are reacting to
+          run_id: ${{ github.event.workflow_run.id }}
+          # grab ALL artifacts (each matrix job uploaded one)
+          path: coverage_artifacts
+          # helpful safety when PRs come from forks
+          allow_forks: true
+          workflow_conclusion: success
+
+      - name: List coverage files
+        id: list
+        shell: bash
+        run: |
+          shopt -s globstar nullglob
+          mapfile -t files < <(printf '%s\n' coverage_artifacts/**/coverage.xml)
+          printf '%s\n' "${files[@]}" > files.txt
+          echo "count=${#files[@]}" >> "$GITHUB_OUTPUT"
+          echo "Found ${#files[@]} coverage files:"
+          cat files.txt || true
+
+      # Upload to Codecov with PR/commit overrides so statuses attach to the PR head SHA
+      - name: Upload to Codecov
+        if: steps.list.outputs.count != '0'
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: "@files.txt"
+          flags: unittests
+          fail_ci_if_error: true
+          # tie the upload to the PR's head commit and PR number
+          override_commit: ${{ github.event.workflow_run.head_sha }}
+          override_pr: ${{ github.event.workflow_run.pull_requests[0].number }}
+          override_branch: ${{ github.event.workflow_run.pull_requests[0].head.ref }}
+          name: "CI Unittests (artifact upload)"
+          # If you prefer OIDC instead of a token, comment 'token' and set:
+          # use_oidc: true

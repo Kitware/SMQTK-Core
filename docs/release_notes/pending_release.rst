@@ -4,14 +4,5 @@ Pending Release Notes
 Updates / New Features
 ----------------------
 
-Features
-
-* Enable Pydantic V2 support for the :class:`~smqtk_core.Plugfigurable` class
-
-Dependencies
-
-* Updated locked version of mypy (0.991 -> 1.17.1) as the previous version was
-  getting old and presenting invalid warnings.
-
 Fixes
 -----

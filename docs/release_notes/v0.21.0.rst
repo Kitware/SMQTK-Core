@@ -1,6 +1,9 @@
 v0.21.0
 =======
 
+This release adds Pydantic V2 support to the Plugfigurable class and updates
+development dependencies.
+
 Updates / New Features
 ----------------------
 

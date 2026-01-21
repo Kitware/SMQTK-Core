@@ -6,7 +6,7 @@ The simplest is to install via the :command:`pip` command.
 Alternatively, the source tree can be acquired and be locally developed using
 `Poetry`_.
 
-For more information on the use of `Poetry`_, follow these links fr
+For more information on the use of `Poetry`_, follow these links from
 `installation`_ and `usage`_ documentation.
 
 .. _installation: Poetry-installation_
@@ -29,7 +29,14 @@ __ Pip-install-upgrade_
 
 From Source
 -----------
-The following assumes `Poetry`_ is already installed.
+
+It is recommend that source installs are done inside of a Python
+`virtual enviornment <https://docs.python.org/3/tutorial/venv.html>`_.
+The following requires that `Poetry`_ is installed, which can be done with:
+
+.. prompt:: bash
+
+   pip install poetry
 
 Quick Start
 ^^^^^^^^^^^
@@ -38,6 +45,7 @@ Quick Start
 
     cd /where/things/should/go/
     git clone https://github.com/Kitware/smqtk-core.git ./
+    # Poetry will install the module in development mode (similar to ``pip install -e .``)
     poetry install
     # Since we're from source we can test the installation.
     poetry run pytest

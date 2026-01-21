@@ -6,3 +6,8 @@ Updates / New Features
 
 Fixes
 -----
+
+Changes
+-------
+
+* Modified installation docs

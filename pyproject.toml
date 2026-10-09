@@ -8,7 +8,7 @@ name = "smqtk-core"
 # REMEMBER: `distutils.version.*Version` types can be used to compare versions
 # from strings like this.
 # SMQTK prefers to use the strict numbering standard when possible.
-version = "0.21.0"
+version = "0.22.0"
 description = """\
     Python toolkit for pluggable algorithms and data structures for \
     multimedia-based machine learning."""
@@ -29,13 +29,14 @@ classifiers = [
         'Programming Language :: Python :: 3.11',
         'Programming Language :: Python :: 3.12',
         'Programming Language :: Python :: 3.13',
+        'Programming Language :: Python :: 3.14',
 ]
 
 [tool.poetry.dependencies]
 python = "^3.10"
 
 [tool.poetry.dev-dependencies]
-pydantic = ">=2, <3"
+pydantic = ">=2.12, <3"
 # CI
 flake8 = ">=6"
 flake8-mutable = ">=1.2"
@@ -48,11 +49,11 @@ sphinx-argparse = ">=0.4"
 sphinx-prompt = ">=1.5"
 livereload = ">=2.6.3"
 # Testing
-coverage = ">=6.5"
-pytest = ">=7.2"
+coverage = ">=7.10"
+pytest = ">=9.0.3"
 pytest-cov = ">=4"
 # Development
-ipython = ">=8.6.0"
+ipython = ">=8.10.0"
 
 ###############################################################################
 [tool.pytest.ini_options]

@@ -1,0 +1,17 @@
+v0.22.0
+=======
+
+This release adds official Python 3.14 support and CI testing, with development
+dependency updates for compatibility and security.
+
+Updates / New Features
+----------------------
+
+* Added official Python 3.14 support and testing, and updated the test tools
+  and optional Pydantic test dependency for compatibility.
+
+Fixes
+-----
+
+* Updated locked development dependencies to resolve security advisories, and
+  raised the minimum IPython and pytest versions to their patched releases.

@@ -1,6 +1,9 @@
 v0.22.0
 =======
 
+This release adds official Python 3.14 support and CI testing, with development
+dependency updates for compatibility and security.
+
 Updates / New Features
 ----------------------
 

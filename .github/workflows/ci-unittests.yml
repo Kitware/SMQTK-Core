@@ -28,60 +28,59 @@ defaults:
 #       steps.
 jobs:
   lint:
-    runs-on: ubuntu-latest
-    container: python:3.10
+    runs-on: ubuntu-24.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Set up Python
+        id: setup-python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.10"
       # Cache local python environment artifacts for the current python version
       # and poetry lockfile hash.
       - uses: actions/cache@v4
         id: env-cache
         with:
-          # Confirmed that the `.local` directory doesn't exist until the
-          # `pip install --user` is invoked below, so we can be confident that
-          # only our python stuff is being captured in this cache (intentional).
           path: |
             ~/.cache/pypoetry/virtualenvs/
-            ~/.local
-          key: python-3.10-${{ hashFiles('poetry.lock') }}-
+          key: host-ubuntu-24.04-${{ runner.arch }}-python-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('poetry.lock') }}-
       - name: Setup Environment
         uses: ./.github/actions/python-poetry-setup
       - name: Lint with Flake8
         run: poetry run flake8
 
   typecheck:
-    runs-on: ubuntu-latest
-    container: python:3.10
+    runs-on: ubuntu-24.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Set up Python
+        id: setup-python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.10"
       # Cache local python environment artifacts for the current python version
       # and poetry lockfile hash.
       - uses: actions/cache@v4
         id: env-cache
         with:
-          # Confirmed that the `.local` directory doesn't exist until the
-          # `pip install --user` is invoked below, so we can be confident that
-          # only our python stuff is being captured in this cache (intentional).
           path: |
             ~/.cache/pypoetry/virtualenvs/
-            ~/.local
-          key: python-3.10-${{ hashFiles('poetry.lock') }}-
+          key: host-ubuntu-24.04-${{ runner.arch }}-python-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('poetry.lock') }}-
           restore-keys: |
-            python-3.10-
+            host-ubuntu-24.04-${{ runner.arch }}-python-${{ steps.setup-python.outputs.python-version }}-
       - name: Setup Environment
         uses: ./.github/actions/python-poetry-setup
       - name: Typecheck with MyPy
         run: poetry run mypy
 
   pytest:
-    # Running in containers, so this unknown environment is fine.
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     strategy:
       matrix:
@@ -93,7 +92,6 @@ jobs:
       # We want all python versions tested even if one of them happens to fail
       fail-fast: false
 
-    container: python:${{ matrix.python-version }}
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -101,6 +99,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Set up Python
+        id: setup-python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "${{ matrix.python-version }}"
 
       # Cache local python environment artifacts for the current python version
       # and poetry lockfile hash.
@@ -109,13 +112,9 @@ jobs:
       - uses: actions/cache@v4
         id: env-cache
         with:
-          # Confirmed that the `.local` directory doesn't exist until the
-          # `pip install --user` is invoked below, so we can be confident that
-          # only our python stuff is being captured in this cache (intentional).
           path: |
             ~/.cache/pypoetry/virtualenvs/
-            ~/.local
-          key: python-${{ matrix.python-version }}-${{ hashFiles('poetry.lock') }}-${{ matrix.opt-extra }}
+          key: host-ubuntu-24.04-${{ runner.arch }}-python-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('poetry.lock') }}-${{ matrix.opt-extra }}
 
       - name: Setup Environment
         uses: ./.github/actions/python-poetry-setup
